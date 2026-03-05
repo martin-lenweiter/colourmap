@@ -7,7 +7,7 @@ const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 function redactPii(value: unknown): unknown {
   if (value == null) return value;
   if (typeof value === 'string') {
-    return value.replace(EMAIL_RE, '[email]').slice(0, 256) + (value.length > 256 ? '…' : '');
+    return value.replace(EMAIL_RE, '[email]').slice(0, 1024) + (value.length > 1024 ? '…' : '');
   }
   if (Array.isArray(value)) return value.map(redactPii);
   if (typeof value === 'object') {
