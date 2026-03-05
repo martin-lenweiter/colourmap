@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { exportUserData, deleteAllUserData } from '@/lib/db/queries';
-import { getAnonymousId, clearAnonymousId } from '../anonymous-auth';
+import { getAnonymousId, clearAnonymousId } from '@/lib/auth';
 import { logger } from '../../../lib/logger';
 
 /** GET: Export all user data (JSON) */

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { listPatternFlags, createPatternFlag } from '@/lib/db/queries';
 import { detectPatterns } from '@/lib/services/detect-patterns';
-import { getAnonymousId } from '../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../lib/logger';
 
 /** GET: List pattern flags for the current user */

@@ -7,7 +7,7 @@ import {
   listPrinciples,
   listFocusItems,
 } from '@/lib/db/queries';
-import { getAnonymousId } from '../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger } from '../../../lib/logger';
 
 export async function GET() {

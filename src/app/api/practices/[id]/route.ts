@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { updatePracticeStatus, updatePracticeTitle } from '@/lib/db/queries';
-import { getAnonymousId } from '../../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../../lib/logger';
 
 const VALID_STATUSES = ['suggested', 'active', 'completed', 'archived'];

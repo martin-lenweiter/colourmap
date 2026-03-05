@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { loadStateHistoryAllSpaces } from '@/lib/db/queries';
-import { getAnonymousId } from '../../../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../../../lib/logger';
 
 /** GET: Load state history for all three spaces (wider-view). Query: ?days=14 (default, max 365) */

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { updateFocusItem } from '@/lib/db/queries';
-import { getAnonymousId } from '../../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../../lib/logger';
 
 const VALID_STATUSES = ['proposed', 'active', 'completed', 'archived'];

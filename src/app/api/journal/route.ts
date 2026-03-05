@@ -15,7 +15,7 @@ import {
   listFocusItems,
   loadPatternContext,
 } from '@/lib/db/queries';
-import { getAnonymousId } from '../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 
 /**
  * POST: Ingest journal entry (colourmap.journal.ingest)

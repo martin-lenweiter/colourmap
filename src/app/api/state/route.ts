@@ -11,7 +11,7 @@ import {
   listFocusItems,
   listPatternFlags,
 } from '@/lib/db/queries';
-import { getAnonymousId } from '../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 
 /** POST: Complete onboarding — persist initial state (colourmap.onboarding.complete) */
 export async function POST(request: Request) {

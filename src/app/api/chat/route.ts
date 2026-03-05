@@ -17,7 +17,7 @@ import {
   loadPreviousSessionAt,
   hasPendingSuggestedPractice,
 } from '@/lib/db/queries';
-import { getAnonymousId, clearAnonymousId } from '../anonymous-auth';
+import { getAnonymousId, clearAnonymousId } from '@/lib/auth';
 
 export async function POST(request: Request) {
   const start = Date.now();

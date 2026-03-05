@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { SPACE_KEYS } from '@/lib/domain/state';
 import type { SpaceKey } from '@/lib/domain/types';
 import { listPrinciples, createPrinciple } from '@/lib/db/queries';
-import { getAnonymousId } from '../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../lib/logger';
 
 export async function GET(request: Request) {

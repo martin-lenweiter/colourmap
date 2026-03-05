@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { SpaceKey } from '@/lib/domain/types';
 import { loadStateHistory } from '@/lib/db/queries';
-import { getAnonymousId } from '../../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../../lib/logger';
 
 const VALID_SPACES: SpaceKey[] = ['health', 'connection', 'purpose'];

@@ -6,7 +6,7 @@ import {
   loadSessionMessages,
   updateSessionSummary,
 } from '@/lib/db/queries';
-import { getAnonymousId } from '../../../anonymous-auth';
+import { getAnonymousId } from '@/lib/auth';
 import { logger, getTraceId } from '../../../../../lib/logger';
 
 /** PATCH: User corrects the session summary (colourmap.session.summary.correct) */

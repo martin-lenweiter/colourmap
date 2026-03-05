@@ -12,9 +12,9 @@ import type {
   StateDelta,
   UserDataExport,
   UserState,
-} from '../domain/types';
-import { SPACE_KEYS } from '../domain/state';
-import { db } from './client';
+} from '../../domain/types';
+import { SPACE_KEYS } from '../../domain/state';
+import { db } from '../client';
 import {
   colourmapCompassReadings,
   colourmapFocusItems,
@@ -24,7 +24,7 @@ import {
   colourmapSessions,
   colourmapUserState,
   colourmapValues,
-} from './schema';
+} from '../schema';
 
 /** DB uses 'love', domain uses 'connection'. */
 const DB_TO_SPACE: Record<string, SpaceKey> = {
