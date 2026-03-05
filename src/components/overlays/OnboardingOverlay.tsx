@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useCallback } from 'react';
-import type { UserState } from '@/lib/domain/types';
+import { useCallback, useState } from 'react';
 import { DEFAULT_USER_STATE } from '@/lib/domain/state';
+import type { UserState } from '@/lib/domain/types';
 
 interface OnboardingOverlayProps {
   onComplete: (seededState: UserState, uploadedContext?: string) => void;
@@ -106,12 +106,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
   const [fading, setFading] = useState(false);
 
   const buildSeededState = useCallback(
-    (
-      ans: Record<
-        string,
-        { attention: number; alignment: number; tone: string[] }
-      >
-    ) => ({
+    (ans: Record<string, { attention: number; alignment: number; tone: string[] }>) => ({
       health: {
         attention: ans.health?.attention ?? DEFAULT_USER_STATE.health.attention,
         tone: ans.health?.tone ?? [],
@@ -119,15 +114,13 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
         tensions: [],
       },
       connection: {
-        attention:
-          ans.connection?.attention ?? DEFAULT_USER_STATE.connection.attention,
+        attention: ans.connection?.attention ?? DEFAULT_USER_STATE.connection.attention,
         tone: ans.connection?.tone ?? [],
         alignment: ans.connection?.alignment ?? 0.5,
         tensions: [],
       },
       purpose: {
-        attention:
-          ans.purpose?.attention ?? DEFAULT_USER_STATE.purpose.attention,
+        attention: ans.purpose?.attention ?? DEFAULT_USER_STATE.purpose.attention,
         tone: ans.purpose?.tone ?? [],
         alignment: ans.purpose?.alignment ?? 0.5,
         tensions: [],
@@ -137,10 +130,9 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
           (ans.connection?.attention ?? 0.5) +
           (ans.purpose?.attention ?? 0.5)) /
         3,
-      clarity:
-        ((ans.health?.attention ?? 0.5) + (ans.purpose?.attention ?? 0.5)) / 2,
+      clarity: ((ans.health?.attention ?? 0.5) + (ans.purpose?.attention ?? 0.5)) / 2,
     }),
-    []
+    [],
   );
 
   const handleWelcomeNext = useCallback(() => {
@@ -179,7 +171,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
         }, 300);
       }
     },
-    [step, answers]
+    [step, answers],
   );
 
   const handleContextSkip = useCallback(() => {
@@ -195,8 +187,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
     setTimeout(() => onComplete(seeded, text || undefined), 500);
   }, [answers, buildSeededState, uploadedText, onComplete]);
 
-  const question =
-    step > 0 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
+  const question = step > 0 && step <= QUESTIONS.length ? QUESTIONS[step - 1] : null;
   const isWelcomeStep = step === WELCOME_STEP;
   const isContextStep = step === CONTEXT_UPLOAD_STEP;
 
@@ -207,8 +198,7 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
       aria-labelledby="onboarding-title"
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{
-        background:
-          'radial-gradient(ellipse 80% 70% at 50% 45%, #060a12 0%, #060a12 100%)',
+        background: 'radial-gradient(ellipse 80% 70% at 50% 45%, #060a12 0%, #060a12 100%)',
       }}
     >
       <div
@@ -229,21 +219,18 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
 
         {isWelcomeStep ? (
           <>
-            <p
-              id="onboarding-title"
-              className="text-center text-xl font-light text-white/80"
-            >
+            <p id="onboarding-title" className="text-center text-xl font-light text-white/80">
               Colour Map helps you stay aligned with what matters.
             </p>
             <p className="text-center text-sm text-white/50">
-              A living map of three spaces: health, love, and purpose. You check
-              in daily, and the map reflects where you are.
+              A living map of three spaces: health, love, and purpose. You check in daily, and the
+              map reflects where you are.
             </p>
             <p className="text-center text-xs text-white/40">
-              Not therapy. Not a tracker. Not medical advice. A place to see
-              yourself clearly.
+              Not therapy. Not a tracker. Not medical advice. A place to see yourself clearly.
             </p>
             <button
+              type="button"
               onClick={handleWelcomeNext}
               aria-label="Start onboarding"
               className="mt-4 rounded-xl border border-white/20 bg-white/10 px-8 py-4 text-sm text-white/90 transition-all hover:bg-white/15 focus:ring-2 focus:ring-white/30 focus:outline-none"
@@ -254,9 +241,9 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
         ) : isContextStep ? (
           <>
             <p className="text-center text-lg font-light text-white/70">
-              If you have existing journals, values documents, or notes about
-              how you want to live, you can share them here. This helps me
-              understand you faster, but it&apos;s completely optional.
+              If you have existing journals, values documents, or notes about how you want to live,
+              you can share them here. This helps me understand you faster, but it&apos;s completely
+              optional.
             </p>
             <textarea
               value={uploadedText}
@@ -268,12 +255,14 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
             />
             <div className="flex w-full gap-3">
               <button
+                type="button"
                 onClick={handleContextSkip}
                 className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-6 py-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-white/80"
               >
                 Skip
               </button>
               <button
+                type="button"
                 onClick={handleContextAdd}
                 className="flex-1 rounded-xl border border-white/20 bg-white/10 px-6 py-4 text-sm text-white/90 transition-all hover:bg-white/15"
               >
@@ -283,12 +272,11 @@ export function OnboardingOverlay({ onComplete }: OnboardingOverlayProps) {
           </>
         ) : question ? (
           <>
-            <p className="text-center text-lg font-light text-white/70">
-              {question.label}
-            </p>
+            <p className="text-center text-lg font-light text-white/70">{question.label}</p>
             <div className="flex w-full flex-col gap-3">
               {question.options.map((option) => (
                 <button
+                  type="button"
                   key={option.label}
                   onClick={() => handleSelect(option)}
                   className="rounded-xl border border-white/10 bg-white/[0.03] px-6 py-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-white/80"

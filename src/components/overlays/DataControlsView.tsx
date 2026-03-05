@@ -8,11 +8,7 @@ interface DataControlsViewProps {
   onTrackDelete?: () => void;
 }
 
-export function DataControlsView({
-  onBack,
-  onTrackExport,
-  onTrackDelete,
-}: DataControlsViewProps) {
+export function DataControlsView({ onBack, onTrackExport, onTrackDelete }: DataControlsViewProps) {
   const [exporting, setExporting] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
@@ -57,11 +53,13 @@ export function DataControlsView({
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#060a12]">
       <div className="flex items-center gap-4 border-b border-white/5 px-6 py-4">
         <button
+          type="button"
           onClick={onBack}
           className="flex h-11 w-11 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
           aria-label="Back"
         >
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -75,26 +73,22 @@ export function DataControlsView({
             <path d="m12 19-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-lg font-light tracking-wide text-white/70">
-          Data & privacy
-        </h1>
+        <h1 className="text-lg font-light tracking-wide text-white/70">Data & privacy</h1>
       </div>
 
       <div className="flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-8">
         <p className="text-sm text-white/50">
-          Colour Map is not therapy, not medical advice, not a crisis service.
-          Your data stays yours.
+          Colour Map is not therapy, not medical advice, not a crisis service. Your data stays
+          yours.
         </p>
 
         <section>
-          <h2 className="mb-2 text-sm font-medium text-white/60">
-            Export your data
-          </h2>
+          <h2 className="mb-2 text-sm font-medium text-white/60">Export your data</h2>
           <p className="mb-3 text-xs text-white/40">
-            Download a JSON file with your state, sessions, practices, and
-            principles.
+            Download a JSON file with your state, sessions, practices, and principles.
           </p>
           <button
+            type="button"
             onClick={handleExport}
             disabled={exporting}
             className="rounded-lg border border-white/10 bg-white/[0.03] px-4 py-2 text-sm text-white/70 hover:bg-white/[0.06] disabled:opacity-50"
@@ -104,15 +98,13 @@ export function DataControlsView({
         </section>
 
         <section>
-          <h2 className="mb-2 text-sm font-medium text-white/60">
-            Delete all data
-          </h2>
+          <h2 className="mb-2 text-sm font-medium text-white/60">Delete all data</h2>
           <p className="mb-3 text-xs text-white/40">
-            Permanently delete all your data. This cannot be undone. You will
-            need to start over.
+            Permanently delete all your data. This cannot be undone. You will need to start over.
           </p>
           {!deleteConfirm ? (
             <button
+              type="button"
               onClick={() => setDeleteConfirm(true)}
               className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/50 hover:bg-white/[0.03] hover:text-white/70"
             >
@@ -125,12 +117,14 @@ export function DataControlsView({
               </p>
               <div className="flex gap-2">
                 <button
+                  type="button"
                   onClick={() => setDeleteConfirm(false)}
                   className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/5"
                 >
                   Cancel
                 </button>
                 <button
+                  type="button"
                   onClick={handleDelete}
                   disabled={deleting}
                   className="rounded-lg bg-red-500/20 px-4 py-2 text-sm text-red-300 hover:bg-red-500/30 disabled:opacity-50"

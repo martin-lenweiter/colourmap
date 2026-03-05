@@ -53,7 +53,11 @@ export async function transcribe(
   const mimeType = mimeMap[ext] ?? 'audio/ogg';
 
   const formData = new FormData();
-  formData.append('file', new Blob([audioData.buffer as ArrayBuffer], { type: mimeType }), `audio.${ext}`);
+  formData.append(
+    'file',
+    new Blob([audioData.buffer as ArrayBuffer], { type: mimeType }),
+    `audio.${ext}`,
+  );
   formData.append('model', 'voxtral-mini-2507');
   formData.append('language', language);
 
@@ -73,10 +77,7 @@ export async function transcribe(
 }
 
 /** Synthesize text via ElevenLabs. Returns null if TTS not configured. */
-export async function synthesize(
-  text: string,
-  voiceId?: string,
-): Promise<SynthesizeResult | null> {
+export async function synthesize(text: string, voiceId?: string): Promise<SynthesizeResult | null> {
   const apiKey = process.env.ELEVENLABS_API_KEY;
   if (!apiKey) return null;
 

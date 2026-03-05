@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { logger, getTraceId } from '../../../../lib/logger';
-import { transcribe, mimeToFormat, isSttConfigured } from '@/lib/services/voice';
+import { isSttConfigured, mimeToFormat, transcribe } from '@/lib/services/voice';
+import { getTraceId, logger } from '../../../../lib/logger';
 
 /** POST: Transcribe audio blob to text (STT) */
 export async function POST(request: Request) {
@@ -14,17 +14,14 @@ export async function POST(request: Request) {
     if (!isSttConfigured()) {
       return NextResponse.json(
         { error: 'Voice not configured (MISTRAL_API_KEY missing)' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     const formData = (await request.formData()) as unknown as FormData;
     const audio = formData.get('audio') as Blob | null;
     if (!audio || !(audio instanceof Blob)) {
-      return NextResponse.json(
-        { error: 'Missing or invalid audio blob' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing or invalid audio blob' }, { status: 400 });
     }
 
     const bytes = new Uint8Array(await audio.arrayBuffer());
@@ -32,13 +29,13 @@ export async function POST(request: Request) {
     const result = await transcribe(
       bytes,
       mimeToFormat(mime),
-      (formData.get('language') as string) ?? 'en'
+      (formData.get('language') as string) ?? 'en',
     );
 
     if (!result) {
       return NextResponse.json(
         { error: 'Voice not configured (MISTRAL_API_KEY missing)' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -60,9 +57,6 @@ export async function POST(request: Request) {
       traceId,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Transcription failed' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });
   }
 }

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { loadStateHistoryAllSpaces } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../../lib/logger';
+import { loadStateHistoryAllSpaces } from '@/lib/db/queries';
+import { getTraceId, logger } from '../../../../../lib/logger';
 
 /** GET: Load state history for all three spaces (wider-view). Query: ?days=14 (default, max 365) */
 export async function GET(request: Request) {
@@ -22,9 +22,6 @@ export async function GET(request: Request) {
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to load state history' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load state history' }, { status: 500 });
   }
 }

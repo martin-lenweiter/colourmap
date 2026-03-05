@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useCallback } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { fetchWithRetry } from '@/lib/utils/fetch-with-retry';
 
 interface VoiceInputProps {
@@ -9,11 +9,7 @@ interface VoiceInputProps {
   className?: string;
 }
 
-export function VoiceInput({
-  onTranscription,
-  disabled,
-  className = '',
-}: VoiceInputProps) {
+export function VoiceInput({ onTranscription, disabled, className = '' }: VoiceInputProps) {
   const [isRecording, setIsRecording] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -31,7 +27,7 @@ export function VoiceInput({
       };
 
       recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
+        for (const t of stream.getTracks()) t.stop();
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType });
         if (blob.size < 100) return;
 
@@ -47,9 +43,7 @@ export function VoiceInput({
             const data = (await res.json().catch(() => ({}))) as {
               error?: string;
             };
-            throw new Error(
-              data.error ?? "Couldn't hear that — try typing instead"
-            );
+            throw new Error(data.error ?? "Couldn't hear that — try typing instead");
           }
           const data = (await res.json()) as { text: string };
           if (data.text?.trim()) onTranscription(data.text.trim());
@@ -99,6 +93,7 @@ export function VoiceInput({
           <span className="flex h-3 w-3 animate-pulse rounded-full bg-red-400" />
         ) : (
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"

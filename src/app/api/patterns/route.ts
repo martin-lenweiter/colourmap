@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server';
-import { listPatternFlags, createPatternFlag } from '@/lib/db/queries';
-import { detectPatterns } from '@/lib/services/detect-patterns';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../lib/logger';
+import { listPatternFlags } from '@/lib/db/queries';
+import { detectAndPersistPatterns, detectPatterns } from '@/lib/services/detect-patterns';
+import { getTraceId, logger } from '../../../lib/logger';
 
-/** GET: List pattern flags for the current user */
 export async function GET(request: Request) {
   try {
     const ownerId = await getAnonymousId();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status') as
-      | 'pending'
-      | 'confirmed'
-      | 'dismissed'
-      | null;
+    const status = searchParams.get('status') as 'pending' | 'confirmed' | 'dismissed' | null;
     const minConfidence = searchParams.get('minConfidence');
     const conf = minConfidence ? parseFloat(minConfidence) : undefined;
 
@@ -29,14 +24,10 @@ export async function GET(request: Request) {
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to list patterns' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to list patterns' }, { status: 500 });
   }
 }
 
-/** POST: Run pattern detection. Optionally create new flags (body: { create?: boolean }). */
 export async function POST(request: Request) {
   try {
     const ownerId = await getAnonymousId();
@@ -47,24 +38,9 @@ export async function POST(request: Request) {
       // no body is fine
     }
 
-    const detected = await detectPatterns(ownerId);
-
-    if (body.create && detected.length > 0) {
-      const existing = await listPatternFlags(ownerId);
-      const existingDescs = new Set(existing.map((f) => f.description));
-      for (const p of detected) {
-        if (!existingDescs.has(p.description)) {
-          await createPatternFlag(ownerId, {
-            description: p.description,
-            confidence: p.confidence,
-            spaceKey: p.spaceKey,
-            firstObserved: new Date(p.firstObserved),
-            lastRelevant: new Date(p.lastRelevant),
-          });
-          existingDescs.add(p.description);
-        }
-      }
-    }
+    const detected = body.create
+      ? await detectAndPersistPatterns(ownerId)
+      : await detectPatterns(ownerId);
 
     return NextResponse.json({
       detected: detected.map((p) => ({
@@ -82,9 +58,6 @@ export async function POST(request: Request) {
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to detect patterns' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to detect patterns' }, { status: 500 });
   }
 }

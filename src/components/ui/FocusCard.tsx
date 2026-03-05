@@ -23,6 +23,7 @@ export function FocusCard({ item, onUpdateStatus }: FocusCardProps) {
       <div className="flex gap-2">
         {isProposed && (
           <button
+            type="button"
             onClick={() => onUpdateStatus(item.id, 'active')}
             className="min-h-[44px] rounded-lg border border-white/10 px-4 py-2.5 text-xs text-white/50 transition-colors hover:border-white/20 hover:text-white/70"
           >
@@ -31,6 +32,7 @@ export function FocusCard({ item, onUpdateStatus }: FocusCardProps) {
         )}
         {isActive && (
           <button
+            type="button"
             onClick={() => onUpdateStatus(item.id, 'completed')}
             className="min-h-[44px] rounded-lg border border-white/10 px-4 py-2.5 text-xs text-white/50 transition-colors hover:border-teal-500/30 hover:text-teal-400/70"
           >
@@ -39,6 +41,7 @@ export function FocusCard({ item, onUpdateStatus }: FocusCardProps) {
         )}
         {(isProposed || isActive) && (
           <button
+            type="button"
             onClick={() => onUpdateStatus(item.id, 'archived')}
             className="min-h-[44px] rounded-lg px-3 py-2.5 text-xs text-white/25 transition-colors hover:text-white/40"
           >

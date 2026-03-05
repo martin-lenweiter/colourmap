@@ -9,7 +9,7 @@ export interface FetchWithRetryOptions extends Omit<RequestInit, 'signal'> {
 
 export async function fetchWithRetry(
   url: string,
-  options: FetchWithRetryOptions = {}
+  options: FetchWithRetryOptions = {},
 ): Promise<Response> {
   const { timeoutMs = 30000, retries = 2, ...init } = options;
   let lastErr: unknown;

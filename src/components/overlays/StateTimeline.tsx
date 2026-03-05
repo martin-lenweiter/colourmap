@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 interface TimelinePoint {
   value: number;
@@ -156,12 +156,7 @@ export function StateTimeline({ points, color, label }: StateTimelineProps) {
     ctx.lineTo(firstCoord.x, h - paddingBottom);
     ctx.closePath();
 
-    const gradient = ctx.createLinearGradient(
-      0,
-      paddingTop,
-      0,
-      h - paddingBottom
-    );
+    const gradient = ctx.createLinearGradient(0, paddingTop, 0, h - paddingBottom);
     gradient.addColorStop(0, toRgba(color, 0.12));
     gradient.addColorStop(1, toRgba(color, 0));
     ctx.fillStyle = gradient;
@@ -199,14 +194,8 @@ export function StateTimeline({ points, color, label }: StateTimelineProps) {
 
   return (
     <div className="flex flex-col gap-1">
-      <span className="text-[10px] tracking-widest text-white/25 uppercase">
-        {label}
-      </span>
-      <canvas
-        ref={canvasRef}
-        className="h-28 w-full"
-        style={{ background: 'transparent' }}
-      />
+      <span className="text-[10px] tracking-widest text-white/25 uppercase">{label}</span>
+      <canvas ref={canvasRef} className="h-28 w-full" style={{ background: 'transparent' }} />
     </div>
   );
 }

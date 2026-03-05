@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-
+import { SPACE_KEYS } from '../domain/state';
 import type {
   CoachMessage,
   CoachResponse,
@@ -10,7 +10,6 @@ import type {
   StateDelta,
   UserState,
 } from '../domain/types';
-import { SPACE_KEYS } from '../domain/state';
 
 function getClient(): Anthropic {
   const apiKey = process.env.ANTHROPIC_API_KEY;

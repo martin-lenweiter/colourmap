@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import type { SpaceKey, UserState } from '@/lib/domain/types';
 import { FloatingChat } from '../chat/FloatingChat';
-import { PrinciplesList } from '../ui/PrinciplesList';
 import { FocusList } from '../ui/FocusList';
+import { PrinciplesList } from '../ui/PrinciplesList';
 import { StateTimeline } from './StateTimeline';
-import type { UserState, SpaceKey } from '@/lib/domain/types';
 
 interface HistoryPoint {
   attention: number;
@@ -20,10 +20,7 @@ interface SpaceExplorerProps {
   onBack: () => void;
 }
 
-const SPACE_CONFIG: Record<
-  SpaceKey,
-  { label: string; color: string; gradient: string }
-> = {
+const SPACE_CONFIG: Record<SpaceKey, { label: string; color: string; gradient: string }> = {
   health: {
     label: 'Health',
     color: 'rgb(64, 224, 208)',
@@ -41,15 +38,8 @@ const SPACE_CONFIG: Record<
   },
 };
 
-export function SpaceExplorer({
-  space,
-  state,
-  onStateUpdate,
-  onBack,
-}: SpaceExplorerProps) {
-  const [historyPoints, setHistoryPoints] = useState<HistoryPoint[] | null>(
-    null
-  );
+export function SpaceExplorer({ space, state, onStateUpdate, onBack }: SpaceExplorerProps) {
+  const [historyPoints, setHistoryPoints] = useState<HistoryPoint[] | null>(null);
 
   const config = SPACE_CONFIG[space];
   const spaceState = state[space];
@@ -78,10 +68,12 @@ export function SpaceExplorer({
       {/* Header */}
       <div className="flex items-center gap-4 border-b border-white/5 px-6 py-4">
         <button
+          type="button"
           onClick={onBack}
           className="flex h-11 w-11 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
         >
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -100,17 +92,12 @@ export function SpaceExplorer({
             className="h-3 w-3 rounded-full"
             style={{ background: config.color, opacity: 0.7 }}
           />
-          <h1 className="text-lg font-light tracking-wide text-white/70">
-            {config.label}
-          </h1>
+          <h1 className="text-lg font-light tracking-wide text-white/70">{config.label}</h1>
         </div>
       </div>
 
       {/* State dashboard — full width, centered */}
-      <div
-        className="flex-1 overflow-y-auto px-6 py-5"
-        style={{ scrollbarWidth: 'none' }}
-      >
+      <div className="flex-1 overflow-y-auto px-6 py-5" style={{ scrollbarWidth: 'none' }}>
         <div className="mx-auto max-w-2xl">
           <div className="flex flex-col gap-1">
             <span className="group relative cursor-default text-[11px] tracking-widest text-white/30 uppercase">
@@ -177,9 +164,7 @@ export function SpaceExplorer({
           {/* Tensions */}
           {spaceState.tensions.length > 0 && (
             <div className="mt-4 flex flex-col gap-1.5">
-              <span className="text-[11px] tracking-widest text-white/30 uppercase">
-                Tensions
-              </span>
+              <span className="text-[11px] tracking-widest text-white/30 uppercase">Tensions</span>
               {spaceState.tensions.map((t) => (
                 <span key={t} className="text-xs text-white/50">
                   {t}
@@ -210,9 +195,7 @@ export function SpaceExplorer({
                   value: p.alignment,
                   date: p.date,
                 }))}
-                color={config.color
-                  .replace('rgb(', 'rgba(')
-                  .replace(')', ', 0.6)')}
+                color={config.color.replace('rgb(', 'rgba(').replace(')', ', 0.6)')}
                 label="Alignment trend"
               />
             </div>
@@ -231,12 +214,7 @@ export function SpaceExplorer({
       </div>
 
       {/* Floating chat for space exploration */}
-      <FloatingChat
-        key={space}
-        sessionId="auto"
-        onStateUpdate={onStateUpdate}
-        space={space}
-      />
+      <FloatingChat key={space} sessionId="auto" onStateUpdate={onStateUpdate} space={space} />
     </div>
   );
 }

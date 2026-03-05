@@ -1,9 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { PrinciplesList } from '../ui/PrinciplesList';
-import { FocusList } from '../ui/FocusList';
+import { useCallback, useEffect, useState } from 'react';
 import type { CompassReading, SpaceKey } from '@/lib/domain/types';
+import { FocusList } from '../ui/FocusList';
+import { PrinciplesList } from '../ui/PrinciplesList';
 
 interface CompassViewProps {
   onBack: () => void;
@@ -22,24 +22,7 @@ export function CompassView({ onBack }: CompassViewProps) {
   const [loadingReading, setLoadingReading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/compass')
-      .then((r) => r.json())
-      .then((data: { reading: CompassReading | null; fresh: boolean }) => {
-        if (data.reading) {
-          setReading(data.reading);
-        } else {
-          // No reading exists — generate one
-          generateReading();
-        }
-      })
-      .catch(() => {
-        // Network error — ignore
-      })
-      .finally(() => setLoadingReading(false));
-  }, []);
-
-  const generateReading = async () => {
+  const generateReading = useCallback(async () => {
     setRefreshing(true);
     try {
       const res = await fetch('/api/compass', { method: 'POST' });
@@ -54,17 +37,35 @@ export function CompassView({ onBack }: CompassViewProps) {
       setRefreshing(false);
       setLoadingReading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetch('/api/compass')
+      .then((r) => r.json())
+      .then((data: { reading: CompassReading | null; fresh: boolean }) => {
+        if (data.reading) {
+          setReading(data.reading);
+        } else {
+          generateReading();
+        }
+      })
+      .catch(() => {
+        // Network error — ignore
+      })
+      .finally(() => setLoadingReading(false));
+  }, [generateReading]);
 
   return (
     <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#060a12]">
       {/* Header */}
       <div className="flex items-center gap-4 border-b border-white/5 px-6 py-4">
         <button
+          type="button"
           onClick={onBack}
           className="flex h-11 w-11 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
         >
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -78,16 +79,11 @@ export function CompassView({ onBack }: CompassViewProps) {
             <path d="m12 19-7-7 7-7" />
           </svg>
         </button>
-        <h1 className="text-lg font-light tracking-wide text-white/70">
-          Compass
-        </h1>
+        <h1 className="text-lg font-light tracking-wide text-white/70">Compass</h1>
       </div>
 
       {/* Scrollable content */}
-      <div
-        className="flex-1 overflow-y-auto px-6 py-6"
-        style={{ scrollbarWidth: 'none' }}
-      >
+      <div className="flex-1 overflow-y-auto px-6 py-6" style={{ scrollbarWidth: 'none' }}>
         <div className="mx-auto max-w-5xl">
           {/* Three-column layout */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
@@ -123,6 +119,7 @@ export function CompassView({ onBack }: CompassViewProps) {
                 Compass Reading
               </span>
               <button
+                type="button"
                 onClick={generateReading}
                 disabled={refreshing}
                 className="min-h-[44px] rounded-lg px-3 py-2 text-[11px] text-white/25 transition-colors hover:text-white/50 disabled:opacity-50"
@@ -140,9 +137,7 @@ export function CompassView({ onBack }: CompassViewProps) {
             ) : reading ? (
               <div className="mt-4 flex flex-col gap-5">
                 {/* Narrative */}
-                <p className="text-sm leading-relaxed text-white/50">
-                  {reading.narrative}
-                </p>
+                <p className="text-sm leading-relaxed text-white/50">{reading.narrative}</p>
 
                 {/* Reinforcements */}
                 {reading.reinforcements.length > 0 && (
@@ -183,9 +178,7 @@ export function CompassView({ onBack }: CompassViewProps) {
                 )}
               </div>
             ) : (
-              <p className="mt-4 text-sm text-white/30">
-                No reading available yet.
-              </p>
+              <p className="mt-4 text-sm text-white/30">No reading available yet.</p>
             )}
           </div>
         </div>

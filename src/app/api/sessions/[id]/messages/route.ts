@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
-import { findSessionByOwner, loadSessionMessages } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../../lib/logger';
+import { findSessionByOwner, loadSessionMessages } from '@/lib/db/queries';
+import { getTraceId, logger } from '../../../../../lib/logger';
 
-export async function GET(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function GET(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
@@ -25,9 +22,6 @@ export async function GET(
       traceId: getTraceId(_request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to load messages' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load messages' }, { status: 500 });
   }
 }

@@ -1,9 +1,11 @@
-import { and, eq, gte, inArray, isNotNull } from 'drizzle-orm';
-
-import type { SpaceKey } from '../domain/types';
+import {
+  createPatternFlag,
+  listPatternFlags,
+  loadMessageDeltasForSessions,
+  loadSessionsForPatternDetection,
+} from '../db/queries';
 import { SPACE_KEYS } from '../domain/state';
-import { db } from '../db/client';
-import { colourmapMessages, colourmapSessions } from '../db/schema';
+import type { SpaceKey } from '../domain/types';
 
 const MIN_DAYS = 56; // 8 weeks
 const CONFIDENCE_THRESHOLD = 0.6;
@@ -34,28 +36,12 @@ const DB_SPACE_MAP: Record<string, SpaceKey> = {
 export async function detectPatterns(ownerId: string): Promise<DetectedPattern[]> {
   const since = new Date(Date.now() - MIN_DAYS * 24 * 60 * 60 * 1000);
 
-  const allSessions = await db
-    .select({ id: colourmapSessions.id, createdAt: colourmapSessions.createdAt })
-    .from(colourmapSessions)
-    .where(and(eq(colourmapSessions.ownerId, ownerId), gte(colourmapSessions.createdAt, since)))
-    .orderBy(colourmapSessions.createdAt);
+  const allSessions = await loadSessionsForPatternDetection(ownerId, since);
 
   if (allSessions.length < 4) return [];
 
   const sessionIds = allSessions.map((s) => s.id);
-  const messages = await db
-    .select({
-      sessionId: colourmapMessages.sessionId,
-      stateDeltas: colourmapMessages.stateDeltas,
-    })
-    .from(colourmapMessages)
-    .where(
-      and(
-        inArray(colourmapMessages.sessionId, sessionIds),
-        eq(colourmapMessages.role, 'assistant'),
-        isNotNull(colourmapMessages.stateDeltas),
-      ),
-    );
+  const messages = await loadMessageDeltasForSessions(sessionIds);
 
   const aggregates: SessionAggregate[] = [];
 
@@ -194,4 +180,27 @@ export async function detectPatterns(ownerId: string): Promise<DetectedPattern[]
   }
 
   return patterns.filter((p) => p.confidence >= CONFIDENCE_THRESHOLD);
+}
+
+export async function detectAndPersistPatterns(ownerId: string): Promise<DetectedPattern[]> {
+  const detected = await detectPatterns(ownerId);
+  if (detected.length === 0) return detected;
+
+  const existing = await listPatternFlags(ownerId);
+  const existingDescs = new Set(existing.map((f) => f.description));
+
+  for (const p of detected) {
+    if (!existingDescs.has(p.description)) {
+      await createPatternFlag(ownerId, {
+        description: p.description,
+        confidence: p.confidence,
+        spaceKey: p.spaceKey,
+        firstObserved: p.firstObserved,
+        lastRelevant: p.lastRelevant,
+      });
+      existingDescs.add(p.description);
+    }
+  }
+
+  return detected;
 }

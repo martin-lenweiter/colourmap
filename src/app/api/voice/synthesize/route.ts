@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { logger, getTraceId } from '../../../../lib/logger';
-import { synthesize, isTtsConfigured } from '@/lib/services/voice';
+import { isTtsConfigured, synthesize } from '@/lib/services/voice';
+import { getTraceId, logger } from '../../../../lib/logger';
 
 /** POST: Synthesize text to speech (TTS) */
 export async function POST(request: Request) {
@@ -14,26 +14,20 @@ export async function POST(request: Request) {
     if (!isTtsConfigured()) {
       return NextResponse.json(
         { error: 'Voice not configured (ELEVENLABS_API_KEY missing)' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
     const body = (await request.json()) as { text: string; voiceId?: string };
     const text = typeof body.text === 'string' ? body.text.trim() : '';
     if (!text) {
-      return NextResponse.json(
-        { error: 'Missing or empty text' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Missing or empty text' }, { status: 400 });
     }
 
     const result = await synthesize(text, body.voiceId);
 
     if (!result) {
-      return NextResponse.json(
-        { error: 'No audio generated' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'No audio generated' }, { status: 500 });
     }
 
     logger.info('Synthesize request completed', {

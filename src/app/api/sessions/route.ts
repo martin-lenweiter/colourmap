@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { listSessions } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
+import { listSessions } from '@/lib/db/queries';
 import { logger } from '../../../lib/logger';
 
 export async function GET() {
@@ -14,9 +14,6 @@ export async function GET() {
       status: 500,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to load sessions' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load sessions' }, { status: 500 });
   }
 }

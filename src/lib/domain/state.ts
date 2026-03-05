@@ -1,4 +1,4 @@
-import type { UserState, StateDelta, SpaceState, SpaceKey, DriftInfo } from './types';
+import type { DriftInfo, SpaceKey, SpaceState, StateDelta, UserState } from './types';
 
 export type { UserState, StateDelta, SpaceState, SpaceKey };
 
@@ -18,7 +18,11 @@ export interface MergeStateOptions {
   isUserCorrection?: boolean;
 }
 
-function mergeSpace(current: SpaceState, delta?: Partial<SpaceState>, override = false): SpaceState {
+function mergeSpace(
+  current: SpaceState,
+  delta?: Partial<SpaceState>,
+  override = false,
+): SpaceState {
   if (!delta) return current;
   const blend = (curr: number, next: number) =>
     override ? next : EMA_WEIGHT * next + (1 - EMA_WEIGHT) * curr;

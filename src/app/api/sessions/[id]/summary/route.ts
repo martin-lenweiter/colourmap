@@ -1,19 +1,10 @@
 import { NextResponse } from 'next/server';
-import { generateSessionSummary } from '@/lib/services/coach';
-import {
-  findSessionByOwner,
-  listSessions,
-  loadSessionMessages,
-  updateSessionSummary,
-} from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../../lib/logger';
+import { findSessionByOwner, updateSessionSummary } from '@/lib/db/queries';
+import { getOrGenerateSessionSummary } from '@/lib/services/session';
+import { getTraceId, logger } from '../../../../../lib/logger';
 
-/** PATCH: User corrects the session summary (colourmap.session.summary.correct) */
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
@@ -27,20 +18,15 @@ export async function PATCH(
     try {
       body = (await request.json()) as { correctedSummary: string };
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
     const correctedSummary =
-      typeof body.correctedSummary === 'string'
-        ? body.correctedSummary.trim()
-        : '';
+      typeof body.correctedSummary === 'string' ? body.correctedSummary.trim() : '';
     if (correctedSummary.length === 0) {
       return NextResponse.json(
         { error: 'correctedSummary must be a non-empty string' },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -48,17 +34,11 @@ export async function PATCH(
     return NextResponse.json({ summary: correctedSummary });
   } catch (err) {
     console.error('Session summary correction error:', err);
-    return NextResponse.json(
-      { error: 'Failed to save correction' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to save correction' }, { status: 500 });
   }
 }
 
-export async function POST(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function POST(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
@@ -68,25 +48,7 @@ export async function POST(
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
 
-    const sessions = await listSessions(ownerId);
-    const existing = sessions.find((s) => s.id === id);
-    const isCorrupted =
-      existing?.summary &&
-      (existing.summary.includes('---') ||
-        existing.summary.includes('**Summary:**') ||
-        existing.summary.length > 200);
-    if (existing?.summary && !isCorrupted) {
-      return NextResponse.json({ summary: existing.summary });
-    }
-
-    const messages = await loadSessionMessages(id);
-    if (messages.length < 2) {
-      return NextResponse.json({ summary: null });
-    }
-
-    const summary = await generateSessionSummary(messages);
-    await updateSessionSummary(id, summary);
-
+    const summary = await getOrGenerateSessionSummary(id, ownerId);
     return NextResponse.json({ summary });
   } catch (err) {
     logger.error('Session summary failed', {
@@ -95,9 +57,6 @@ export async function POST(
       traceId: getTraceId(_request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to generate summary' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate summary' }, { status: 500 });
   }
 }

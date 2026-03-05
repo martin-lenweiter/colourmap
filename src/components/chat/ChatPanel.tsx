@@ -1,11 +1,10 @@
 'use client';
 
-import { useState, useRef, useEffect, useCallback } from 'react';
-import { ChatMessage } from './ChatMessage';
-import { VoiceInput } from '../voice/VoiceInput';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { DriftInfo, SpaceKey, StateDelta, UserState } from '@/lib/domain/types';
 import { fetchWithRetry } from '@/lib/utils/fetch-with-retry';
-import type { UserState, StateDelta, SpaceKey } from '@/lib/domain/types';
-import type { DriftInfo } from '@/lib/domain/types';
+import { VoiceInput } from '../voice/VoiceInput';
+import { ChatMessage } from './ChatMessage';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -31,7 +30,7 @@ function DriftNotice({
   if (dismissed) return null;
 
   const drifting = (['health', 'connection', 'purpose'] as const).filter(
-    (s) => driftInfo[s].isDrifting
+    (s) => driftInfo[s].isDrifting,
   );
   if (drifting.length === 0) return null;
 
@@ -40,6 +39,7 @@ function DriftNotice({
       <div className="flex items-center gap-1.5">
         {drifting.map((s) => (
           <button
+            type="button"
             key={s}
             onClick={() => {
               onSpaceClick?.(s);
@@ -98,7 +98,7 @@ export function ChatPanel({
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, scrollToBottom]);
+  }, [scrollToBottom]);
 
   useEffect(() => {
     if (messages.length > 0) return;
@@ -169,7 +169,15 @@ export function ChatPanel({
       }
     };
     autoSend();
-  }, [initialContext, space]); // intentionally limited deps — only fire on context/space change
+  }, [
+    initialContext,
+    space,
+    messages.length,
+    onAssistantMessage,
+    onContextSent,
+    onStateUpdate,
+    sessionId,
+  ]); // intentionally limited deps — only fire on context/space change
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInput(e.target.value);
@@ -220,10 +228,7 @@ export function ChatPanel({
           newState: UserState;
         };
 
-        setMessages((prev) => [
-          ...prev,
-          { role: 'assistant', content: data.response },
-        ]);
+        setMessages((prev) => [...prev, { role: 'assistant', content: data.response }]);
 
         onStateUpdate(data.newState);
         onAssistantMessage?.();
@@ -247,15 +252,7 @@ export function ChatPanel({
         setIsLoading(false);
       }
     },
-    [
-      input,
-      isLoading,
-      messages,
-      sessionId,
-      space,
-      onStateUpdate,
-      onAssistantMessage,
-    ]
+    [input, isLoading, messages, sessionId, space, onStateUpdate, onAssistantMessage],
   );
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -265,9 +262,7 @@ export function ChatPanel({
     }
   };
 
-  const placeholder = space
-    ? `Explore your ${space}...`
-    : "Share what's on your mind...";
+  const placeholder = space ? `Explore your ${space}...` : "Share what's on your mind...";
 
   return (
     <div className="flex h-full flex-col">
@@ -290,7 +285,7 @@ export function ChatPanel({
         )}
         {messages.map((msg, i) => (
           <ChatMessage
-            key={i}
+            key={`${msg.role}-${i}`}
             role={msg.role}
             content={msg.content}
             compact={compact}
@@ -311,9 +306,7 @@ export function ChatPanel({
         <div ref={messagesEndRef} />
       </div>
 
-      <div
-        className={`border-t border-white/5 ${compact ? 'px-4 py-3' : 'px-6 py-4'}`}
-      >
+      <div className={`border-t border-white/5 ${compact ? 'px-4 py-3' : 'px-6 py-4'}`}>
         {!compact && (
           <div className="flex items-center justify-end">
             <span
@@ -325,19 +318,7 @@ export function ChatPanel({
             </span>
           </div>
         )}
-        <div
-          role="group"
-          tabIndex={0}
-          className="flex cursor-text items-end gap-3"
-          onClick={() => inputRef.current?.focus()}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              inputRef.current?.focus();
-            }
-          }}
-          aria-label="Message input area"
-        >
+        <div className="flex cursor-text items-end gap-3">
           <VoiceInput
             onTranscription={(text) => {
               setInput((prev) => (prev ? `${prev} ${text}` : text));
@@ -358,6 +339,7 @@ export function ChatPanel({
             }`}
           />
           <button
+            type="button"
             aria-label="Send message"
             onClick={() => sendMessage()}
             disabled={!input.trim() || isLoading}
@@ -368,6 +350,7 @@ export function ChatPanel({
             }`}
           >
             <svg
+              aria-hidden="true"
               width="20"
               height="20"
               viewBox="0 0 24 24"

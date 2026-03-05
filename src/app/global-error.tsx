@@ -21,6 +21,7 @@ export default function GlobalError({
           A critical error occurred. Please refresh the page.
         </p>
         <button
+          type="button"
           onClick={reset}
           style={{
             marginTop: '1rem',

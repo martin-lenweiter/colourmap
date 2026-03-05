@@ -1,12 +1,7 @@
-import type { UserState, SpaceKey, Principle, FocusItem, PatternContext, SessionPattern } from './types';
 import { SPACE_KEYS } from './state';
+import type { FocusItem, PatternContext, Principle, SpaceKey, UserState } from './types';
 
-export type PromptPriority =
-  | 'acute'
-  | 'staleness'
-  | 'misalignment'
-  | 'pattern'
-  | 'broadening';
+export type PromptPriority = 'acute' | 'staleness' | 'misalignment' | 'pattern' | 'broadening';
 
 interface PrioritySignal {
   space: SpaceKey;
@@ -241,7 +236,7 @@ function buildPatternBlock(context?: PatternContext): string {
   }
 
   lines.push('\nUse patterns to inform your question. Never announce them.');
-  return '\n\n' + lines.join('\n');
+  return `\n\n${lines.join('\n')}`;
 }
 
 function buildPrinciplesContext(values?: Principle[]): string {
@@ -260,7 +255,9 @@ function buildPrinciplesContext(values?: Principle[]): string {
     for (const v of confirmed) {
       lines.push(`- [${v.spaceKey}] "${v.text}"`);
     }
-    lines.push("Reference confirmed values naturally when relevant. They're the user's declared anchors.");
+    lines.push(
+      "Reference confirmed values naturally when relevant. They're the user's declared anchors.",
+    );
   }
 
   if (proposed.length > 0) {
@@ -270,7 +267,7 @@ function buildPrinciplesContext(values?: Principle[]): string {
     lines.push('Do NOT push unconfirmed values. Let the user decide if they resonate.');
   }
 
-  return '\n\n' + lines.join('\n');
+  return `\n\n${lines.join('\n')}`;
 }
 
 function buildFocusContext(focusItems?: FocusItem[]): string {
@@ -292,9 +289,7 @@ function buildFocusContext(focusItems?: FocusItem[]): string {
   }
 
   if (proposed.length > 0) {
-    lines.push(
-      `\nProposed but not accepted: ${proposed.map((f) => `"${f.text}"`).join(', ')}.`,
-    );
+    lines.push(`\nProposed but not accepted: ${proposed.map((f) => `"${f.text}"`).join(', ')}.`);
     lines.push('Do NOT follow up on proposed-but-not-accepted focus areas.');
   }
 
@@ -302,7 +297,7 @@ function buildFocusContext(focusItems?: FocusItem[]): string {
     lines.push('\n3+ active focus areas. Do NOT suggest new ones until some are completed.');
   }
 
-  return '\n\n' + lines.join('\n');
+  return `\n\n${lines.join('\n')}`;
 }
 
 export function buildCoachSystemPrompt(

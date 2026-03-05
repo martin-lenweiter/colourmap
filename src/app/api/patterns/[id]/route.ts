@@ -1,21 +1,15 @@
 import { NextResponse } from 'next/server';
-import { confirmPatternFlag, dismissPatternFlag } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../lib/logger';
+import { confirmPatternFlag, dismissPatternFlag } from '@/lib/db/queries';
+import { getTraceId, logger } from '../../../../lib/logger';
 
 /** PATCH: Confirm or dismiss a pattern flag. Body: { action: 'confirm' | 'dismiss' } */
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
     if (!id) {
-      return NextResponse.json(
-        { error: 'Pattern ID required' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Pattern ID required' }, { status: 400 });
     }
 
     let body: { action?: string } = {};
@@ -35,10 +29,7 @@ export async function PATCH(
       return NextResponse.json({ ok, status: ok ? 'dismissed' : 'unchanged' });
     }
 
-    return NextResponse.json(
-      { error: 'action must be "confirm" or "dismiss"' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'action must be "confirm" or "dismiss"' }, { status: 400 });
   } catch (err) {
     logger.error('Pattern PATCH failed', {
       path: '/api/patterns/[id]',
@@ -46,9 +37,6 @@ export async function PATCH(
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to update pattern' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update pattern' }, { status: 500 });
   }
 }

@@ -48,8 +48,6 @@ export function PrincipleItem({
           onChange={(e) => setEditText(e.target.value)}
           onKeyDown={handleKeyDown}
           onBlur={handleSave}
-          // eslint-disable-next-line jsx-a11y/no-autofocus
-          autoFocus
           className="flex-1 rounded-lg border border-white/10 bg-transparent px-3 py-2 text-xs text-white/70 focus:border-white/20 focus:outline-none"
         />
       </div>
@@ -75,6 +73,7 @@ export function PrincipleItem({
       <div className="flex shrink-0 gap-1 opacity-0 transition-opacity group-hover:opacity-100">
         {!principle.confirmed && (
           <button
+            type="button"
             onClick={() => onConfirm(principle.id)}
             className="min-h-[44px] min-w-[44px] rounded-lg px-2 py-1 text-[11px] text-white/30 transition-colors hover:text-white/60"
           >
@@ -82,12 +81,14 @@ export function PrincipleItem({
           </button>
         )}
         <button
+          type="button"
           onClick={() => setEditing(true)}
           className="min-h-[44px] min-w-[44px] rounded-lg px-2 py-1 text-[11px] text-white/20 transition-colors hover:text-white/40"
         >
           Edit
         </button>
         <button
+          type="button"
           onClick={() => onDismiss(principle.id)}
           className="min-h-[44px] min-w-[44px] rounded-lg px-2 py-1 text-[11px] text-white/20 transition-colors hover:text-white/40"
         >

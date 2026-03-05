@@ -1,43 +1,36 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import {
-  trackOnboardingCompleted,
-  trackOnboardingError,
-  trackCheckInCompleted,
-  trackCheckInSkipped,
-  trackDataExported,
-  trackDataDeleted,
-  trackNavToFutureMe,
-} from '@/lib/analytics';
-import { FloatingChat } from '@/components/chat/FloatingChat';
+import { useEffect, useState } from 'react';
 import { GenerativeCanvas } from '@/components/canvas/GenerativeCanvas';
-import { OnboardingOverlay } from '@/components/overlays/OnboardingOverlay';
+import { FloatingChat } from '@/components/chat/FloatingChat';
 import { CheckInOverlay } from '@/components/overlays/CheckInOverlay';
-import { SpaceExplorer } from '@/components/overlays/SpaceExplorer';
-import { HistoryPanel } from '@/components/overlays/HistoryPanel';
 import { CompassView } from '@/components/overlays/CompassView';
 import { DataControlsView } from '@/components/overlays/DataControlsView';
+import { HistoryPanel } from '@/components/overlays/HistoryPanel';
+import { OnboardingOverlay } from '@/components/overlays/OnboardingOverlay';
+import { SpaceExplorer } from '@/components/overlays/SpaceExplorer';
+import {
+  trackCheckInCompleted,
+  trackCheckInSkipped,
+  trackDataDeleted,
+  trackDataExported,
+  trackNavToFutureMe,
+  trackOnboardingCompleted,
+  trackOnboardingError,
+} from '@/lib/analytics';
 import { DEFAULT_USER_STATE } from '@/lib/domain/state';
-import type { UserState, SpaceKey, DriftInfo } from '@/lib/domain/types';
+import type { DriftInfo, SpaceKey, UserState } from '@/lib/domain/types';
 
-function buildDriftContext(
-  state: UserState,
-  drift: DriftInfo
-): string | undefined {
+function buildDriftContext(state: UserState, drift: DriftInfo): string | undefined {
   const driftingSpaces: string[] = [];
   for (const space of ['health', 'connection', 'purpose'] as const) {
     const sd = drift[space];
     if (sd.isDrifting) {
       const reasons: string[] = [];
       if (sd.staleDays > 2)
-        reasons.push(
-          `hasn't been discussed in ${Math.round(sd.staleDays)} days`
-        );
+        reasons.push(`hasn't been discussed in ${Math.round(sd.staleDays)} days`);
       if (state[space].alignment < 0.3)
-        reasons.push(
-          `alignment is low at ${(state[space].alignment * 100).toFixed(0)}%`
-        );
+        reasons.push(`alignment is low at ${(state[space].alignment * 100).toFixed(0)}%`);
       driftingSpaces.push(`${space} (${reasons.join(', ')})`);
     }
   }
@@ -55,9 +48,7 @@ function buildDriftContext(
 export default function ColourMapPage() {
   const [userState, setUserState] = useState<UserState>(DEFAULT_USER_STATE);
   const [hasOnboarded, setHasOnboarded] = useState<boolean | null>(null);
-  const [onboardingContext, setOnboardingContext] = useState<
-    string | undefined
-  >();
+  const [onboardingContext, setOnboardingContext] = useState<string | undefined>();
   const [driftInfo, setDriftInfo] = useState<DriftInfo | null>(null);
   const [showCheckIn, setShowCheckIn] = useState(false);
   const [activeSpace, setActiveSpace] = useState<SpaceKey | null>(null);
@@ -83,8 +74,7 @@ export default function ColourMapPage() {
             }
 
             const hoursSinceLastSession = data.lastSessionAt
-              ? (Date.now() - new Date(data.lastSessionAt).getTime()) /
-                (1000 * 60 * 60)
+              ? (Date.now() - new Date(data.lastSessionAt).getTime()) / (1000 * 60 * 60)
               : Infinity;
 
             if (hoursSinceLastSession >= 8) {
@@ -96,7 +86,7 @@ export default function ColourMapPage() {
           } else {
             setHasOnboarded(false);
           }
-        }
+        },
       )
       .catch(() => {
         setHasOnboarded(false);
@@ -105,10 +95,7 @@ export default function ColourMapPage() {
 
   if (hasOnboarded === null) return null;
 
-  const handleOnboardingComplete = async (
-    seededState: UserState,
-    uploadedContext?: string
-  ) => {
+  const handleOnboardingComplete = async (seededState: UserState, uploadedContext?: string) => {
     try {
       const res = await fetch('/api/state', {
         method: 'POST',
@@ -118,7 +105,7 @@ export default function ColourMapPage() {
       if (!res.ok) throw new Error('Failed to save onboarding state');
 
       let finalState = seededState;
-      if (uploadedContext && uploadedContext.trim()) {
+      if (uploadedContext?.trim()) {
         const journalRes = await fetch('/api/journal', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -134,7 +121,7 @@ export default function ColourMapPage() {
       setHasOnboarded(true);
       trackOnboardingCompleted(!!uploadedContext?.trim());
       setOnboardingContext(
-        `The user just completed onboarding. Their initial self-assessment: health feels ${finalState.health.tone.join(', ')}, relationships feel ${finalState.connection.tone.join(', ')}, sense of purpose feels ${finalState.purpose.tone.join(', ')}. Energy: ${(finalState.energy * 100).toFixed(0)}%. Start with a warm, personalized opening based on what they shared.`
+        `The user just completed onboarding. Their initial self-assessment: health feels ${finalState.health.tone.join(', ')}, relationships feel ${finalState.connection.tone.join(', ')}, sense of purpose feels ${finalState.purpose.tone.join(', ')}. Energy: ${(finalState.energy * 100).toFixed(0)}%. Start with a warm, personalized opening based on what they shared.`,
       );
     } catch (err) {
       trackOnboardingError(err);
@@ -142,7 +129,7 @@ export default function ColourMapPage() {
       setHasOnboarded(true);
       trackOnboardingCompleted(false);
       setOnboardingContext(
-        `The user just completed onboarding. Their initial self-assessment: health feels ${seededState.health.tone.join(', ')}, relationships feel ${seededState.connection.tone.join(', ')}, sense of purpose feels ${seededState.purpose.tone.join(', ')}. Energy: ${(seededState.energy * 100).toFixed(0)}%. Start with a warm, personalized opening based on what they shared.`
+        `The user just completed onboarding. Their initial self-assessment: health feels ${seededState.health.tone.join(', ')}, relationships feel ${seededState.connection.tone.join(', ')}, sense of purpose feels ${seededState.purpose.tone.join(', ')}. Energy: ${(seededState.energy * 100).toFixed(0)}%. Start with a warm, personalized opening based on what they shared.`,
       );
     }
   };
@@ -175,8 +162,7 @@ export default function ColourMapPage() {
         <div
           className="pointer-events-none absolute inset-0"
           style={{
-            background:
-              'radial-gradient(ellipse 70% 60% at 30% 45%, #0a1628 0%, transparent 70%)',
+            background: 'radial-gradient(ellipse 70% 60% at 30% 45%, #0a1628 0%, transparent 70%)',
           }}
         />
 
@@ -192,11 +178,13 @@ export default function ColourMapPage() {
         {/* Compass button — fixed top-left */}
         {hasOnboarded && (
           <button
+            type="button"
             aria-label="View compass"
             onClick={() => setShowCompass(true)}
             className="fixed top-5 left-5 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/50 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white/70"
           >
             <svg
+              aria-hidden="true"
               width="22"
               height="22"
               viewBox="0 0 24 24"
@@ -219,11 +207,13 @@ export default function ColourMapPage() {
         {/* History button — fixed top-right */}
         {hasOnboarded && (
           <button
+            type="button"
             aria-label="View history"
             onClick={() => setShowHistory(true)}
             className="fixed top-5 right-5 z-30 flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-white/50 backdrop-blur-sm transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white/70"
           >
             <svg
+              aria-hidden="true"
               width="22"
               height="22"
               viewBox="0 0 24 24"
@@ -243,6 +233,7 @@ export default function ColourMapPage() {
         {hasOnboarded && (
           <div className="fixed bottom-5 left-5 z-30 flex flex-wrap items-center gap-4 text-xs">
             <button
+              type="button"
               aria-label="Data and privacy"
               onClick={() => setShowDataControls(true)}
               className="text-white/30 transition-colors hover:text-white/50"
@@ -250,9 +241,7 @@ export default function ColourMapPage() {
               Data & privacy
             </button>
             <a
-              href={
-                process.env.NEXT_PUBLIC_FUTUREME_URL ?? 'https://futureme.app'
-              }
+              href={process.env.NEXT_PUBLIC_FUTUREME_URL ?? 'https://futureme.app'}
               target="_blank"
               rel="noopener noreferrer"
               className="text-white/30 transition-colors hover:text-white/50"
@@ -274,9 +263,7 @@ export default function ColourMapPage() {
         />
 
         {/* Onboarding overlay */}
-        {!hasOnboarded && (
-          <OnboardingOverlay onComplete={handleOnboardingComplete} />
-        )}
+        {!hasOnboarded && <OnboardingOverlay onComplete={handleOnboardingComplete} />}
 
         {/* Daily check-in overlay */}
         {showCheckIn && (

@@ -1,9 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { DriftInfo, SpaceKey, UserState } from '@/lib/domain/types';
 import { ChatPanel } from './ChatPanel';
-import type { UserState, SpaceKey } from '@/lib/domain/types';
-import type { DriftInfo } from '@/lib/domain/types';
 
 interface FloatingChatProps {
   sessionId: string;
@@ -99,10 +98,12 @@ export function FloatingChat({
             {space ? space.charAt(0).toUpperCase() + space.slice(1) : 'Chat'}
           </span>
           <button
+            type="button"
             onClick={() => setIsOpen(false)}
             className="flex h-8 w-8 items-center justify-center rounded-full text-white/30 transition-colors hover:bg-white/5 hover:text-white/50 md:hidden"
           >
             <svg
+              aria-hidden="true"
               width="16"
               height="16"
               viewBox="0 0 24 24"
@@ -136,6 +137,7 @@ export function FloatingChat({
 
       {/* Bubble trigger */}
       <button
+        type="button"
         ref={bubbleRef}
         onClick={toggle}
         className="fixed right-6 bottom-6 z-40 flex h-14 w-14 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] backdrop-blur-md transition-all hover:bg-white/[0.1]"
@@ -147,6 +149,7 @@ export function FloatingChat({
 
         {isOpen ? (
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -162,6 +165,7 @@ export function FloatingChat({
           </svg>
         ) : (
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"

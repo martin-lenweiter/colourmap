@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { ChatMessage } from '../chat/ChatMessage';
 
 interface Session {
@@ -90,9 +90,7 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
           .then((d: { summary: string | null }) => {
             if (d.summary) {
               setSessions((prev) =>
-                prev.map((s) =>
-                  s.id === sessionId ? { ...s, summary: d.summary } : s
-                )
+                prev.map((s) => (s.id === sessionId ? { ...s, summary: d.summary } : s)),
               );
             }
           })
@@ -107,9 +105,7 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
     }
   };
 
-  const activeSession = selectedSession
-    ? sessions.find((s) => s.id === selectedSession)
-    : null;
+  const activeSession = selectedSession ? sessions.find((s) => s.id === selectedSession) : null;
 
   const handleStartCorrect = () => {
     if (activeSession?.summary) {
@@ -130,10 +126,8 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
       if (res.ok) {
         setSessions((prev) =>
           prev.map((s) =>
-            s.id === selectedSession
-              ? { ...s, summary: correctedSummary.trim() }
-              : s
-          )
+            s.id === selectedSession ? { ...s, summary: correctedSummary.trim() } : s,
+          ),
         );
         setEditingSummary(false);
       }
@@ -154,10 +148,12 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
       {/* Header */}
       <div className="flex items-center gap-4 border-b border-white/5 px-6 py-4">
         <button
+          type="button"
           onClick={selectedSession ? () => setSelectedSession(null) : onClose}
           className="flex h-11 w-11 items-center justify-center rounded-full text-white/40 transition-colors hover:bg-white/5 hover:text-white/70"
         >
           <svg
+            aria-hidden="true"
             width="20"
             height="20"
             viewBox="0 0 24 24"
@@ -178,8 +174,9 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
               : (activeSession.summary ?? formatDate(activeSession.created_at))
             : 'History'}
         </h1>
-        {activeSession && activeSession.summary && !editingSummary && (
+        {activeSession?.summary && !editingSummary && (
           <button
+            type="button"
             onClick={handleStartCorrect}
             className="text-xs text-white/40 transition-colors hover:text-white/60"
             aria-label="Correct summary"
@@ -200,12 +197,14 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
           />
           <div className="flex gap-2">
             <button
+              type="button"
               onClick={handleCancelCorrect}
               className="rounded-lg border border-white/10 px-4 py-2 text-sm text-white/60 hover:bg-white/5"
             >
               Cancel
             </button>
             <button
+              type="button"
               onClick={handleSaveCorrection}
               disabled={savingCorrection || !correctedSummary.trim()}
               className="rounded-lg bg-white/10 px-4 py-2 text-sm text-white/90 hover:bg-white/15 disabled:opacity-50"
@@ -221,10 +220,7 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
         {loading && (
           <div className="flex flex-col">
             {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="flex flex-col gap-2 border-b border-white/5 px-6 py-4"
-              >
+              <div key={i} className="flex flex-col gap-2 border-b border-white/5 px-6 py-4">
                 <div className="h-3 w-20 animate-pulse rounded bg-white/[0.06]" />
                 <div className="h-4 w-40 animate-pulse rounded bg-white/[0.04]" />
               </div>
@@ -241,19 +237,16 @@ export function HistoryPanel({ onClose }: HistoryPanelProps) {
         {!loading && !selectedSession && !sessionsError && (
           <div className="flex flex-col">
             {sessions.length === 0 && (
-              <div className="px-6 py-20 text-center text-sm text-white/30">
-                No sessions yet
-              </div>
+              <div className="px-6 py-20 text-center text-sm text-white/30">No sessions yet</div>
             )}
             {sessions.map((session) => (
               <button
+                type="button"
                 key={session.id}
                 onClick={() => handleSelectSession(session.id)}
                 className="flex flex-col gap-1 border-b border-white/5 px-6 py-4 text-left transition-colors hover:bg-white/[0.02]"
               >
-                <span className="text-xs text-white/30">
-                  {formatDate(session.created_at)}
-                </span>
+                <span className="text-xs text-white/30">{formatDate(session.created_at)}</span>
                 <span className="line-clamp-2 text-sm text-white/60">
                   {session.summary ?? 'Check-in session'}
                 </span>

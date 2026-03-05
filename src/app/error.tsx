@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {
@@ -20,6 +20,7 @@ export default function Error({
         An unexpected error occurred. Please try again.
       </p>
       <button
+        type="button"
         onClick={reset}
         style={{
           marginTop: '1rem',

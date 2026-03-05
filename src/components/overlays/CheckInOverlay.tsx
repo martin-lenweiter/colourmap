@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { DriftInfo } from '@/lib/domain/types';
 
 interface CheckInOverlayProps {
@@ -83,11 +83,7 @@ const CIRCLE_SPREAD = [
 
 const CIRCLE_COLORS = ['#2dd4bf', '#fb7185', '#fbbf24'];
 
-export function CheckInOverlay({
-  onComplete,
-  onSkip,
-  driftInfo,
-}: CheckInOverlayProps) {
+export function CheckInOverlay({ onComplete, onSkip, driftInfo }: CheckInOverlayProps) {
   const [phase, setPhase] = useState<Phase>('enter');
   const [step, setStep] = useState(0);
   const [energy, setEnergy] = useState<number | null>(null);
@@ -116,25 +112,21 @@ export function CheckInOverlay({
           : energy !== null && energy >= 0.4
             ? 'moderate'
             : 'low';
-      const energyPct =
-        energy !== null ? `${Math.round(energy * 100)}%` : '50%';
+      const energyPct = energy !== null ? `${Math.round(energy * 100)}%` : '50%';
       const driftSection = driftInfo
         ? (() => {
-            const drifting = (
-              ['health', 'connection', 'purpose'] as const
-            ).filter((s) => driftInfo[s].isDrifting && s !== focusSpace);
-            return drifting.length > 0
-              ? `\nDrifting spaces: ${drifting.join(', ')}.`
-              : '';
+            const drifting = (['health', 'connection', 'purpose'] as const).filter(
+              (s) => driftInfo[s].isDrifting && s !== focusSpace,
+            );
+            return drifting.length > 0 ? `\nDrifting spaces: ${drifting.join(', ')}.` : '';
           })()
         : '';
 
-      const focusLabel =
-        focusSpace === null ? 'all three spaces equally' : `${focusSpace} most`;
+      const focusLabel = focusSpace === null ? 'all three spaces equally' : `${focusSpace} most`;
 
       return `The user completed a daily check-in. Energy: ${energyLabel} (${energyPct}). ${focusLabel} is pulling their attention. They described feeling ${finalTone.join(', ')}.${driftSection} Open with a brief acknowledgment of how they're arriving, then gently move toward ${focusSpace ?? 'whatever feels most alive'}. Be warm but direct.`;
     },
-    [energy, focusSpace, driftInfo]
+    [energy, focusSpace, driftInfo],
   );
 
   const handleEnergySelect = useCallback((value: number) => {
@@ -166,7 +158,7 @@ export function CheckInOverlay({
         }, 900);
       }, 400);
     },
-    [onComplete, buildContextString]
+    [onComplete, buildContextString],
   );
 
   const handleSkip = useCallback(() => {
@@ -182,13 +174,10 @@ export function CheckInOverlay({
       aria-modal="true"
       aria-label="Daily check-in"
       className={`fixed inset-0 z-50 flex items-center justify-center transition-opacity ${
-        skipFading || phase === 'exit'
-          ? 'opacity-0 duration-700'
-          : 'opacity-100 duration-500'
+        skipFading || phase === 'exit' ? 'opacity-0 duration-700' : 'opacity-100 duration-500'
       }`}
       style={{
-        background:
-          'radial-gradient(ellipse 80% 70% at 50% 45%, #060a12 0%, #060a12 100%)',
+        background: 'radial-gradient(ellipse 80% 70% at 50% 45%, #060a12 0%, #060a12 100%)',
       }}
     >
       {/* Animated circles */}
@@ -197,14 +186,8 @@ export function CheckInOverlay({
           key={i}
           className="pointer-events-none fixed"
           style={{
-            width:
-              phase === 'exit'
-                ? 'clamp(160px, 30vw, 280px)'
-                : 'clamp(120px, 25vw, 200px)',
-            height:
-              phase === 'exit'
-                ? 'clamp(160px, 30vw, 280px)'
-                : 'clamp(120px, 25vw, 200px)',
+            width: phase === 'exit' ? 'clamp(160px, 30vw, 280px)' : 'clamp(120px, 25vw, 200px)',
+            height: phase === 'exit' ? 'clamp(160px, 30vw, 280px)' : 'clamp(120px, 25vw, 200px)',
             borderRadius: '50%',
             background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`,
             boxShadow: `0 0 ${converged ? 80 : 40}px ${color}30`,
@@ -214,12 +197,7 @@ export function CheckInOverlay({
               ? 'translate(-50%, -50%)'
               : `translate(calc(-50% + ${CIRCLE_SPREAD[i]?.x ?? '0px'}), calc(-50% + ${CIRCLE_SPREAD[i]?.y ?? '0px'}))`,
             transition: 'all 1.2s cubic-bezier(0.4, 0, 0.2, 1)',
-            filter:
-              phase === 'exit'
-                ? 'blur(45px)'
-                : converged
-                  ? 'blur(30px)'
-                  : 'blur(15px)',
+            filter: phase === 'exit' ? 'blur(45px)' : converged ? 'blur(30px)' : 'blur(15px)',
           }}
         />
       ))}
@@ -246,12 +224,11 @@ export function CheckInOverlay({
           {/* Step 0: Energy */}
           {step === 0 && (
             <>
-              <p className="text-center text-lg font-light text-white/70">
-                How are you arriving?
-              </p>
+              <p className="text-center text-lg font-light text-white/70">How are you arriving?</p>
               <div className="flex w-full flex-col gap-3">
                 {ENERGY_OPTIONS.map((opt) => (
                   <button
+                    type="button"
                     key={opt.label}
                     onClick={() => handleEnergySelect(opt.value)}
                     className="min-h-[44px] rounded-xl border border-white/10 bg-white/[0.03] px-6 py-4 text-sm text-white/60 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-white/80"
@@ -272,6 +249,7 @@ export function CheckInOverlay({
               <div className="flex w-full items-center justify-center gap-6">
                 {FOCUS_OPTIONS.map((opt) => (
                   <button
+                    type="button"
                     key={opt.space}
                     onClick={() => handleFocusSelect(opt.space)}
                     className="group flex min-h-[44px] min-w-[44px] flex-col items-center gap-2"
@@ -290,6 +268,7 @@ export function CheckInOverlay({
                 ))}
               </div>
               <button
+                type="button"
                 onClick={() => handleFocusSelect(null)}
                 className="min-h-[44px] rounded-xl border border-white/10 bg-white/[0.03] px-6 py-3 text-sm text-white/40 transition-all hover:border-white/20 hover:bg-white/[0.06] hover:text-white/60"
               >
@@ -301,9 +280,7 @@ export function CheckInOverlay({
           {/* Step 2: Space-specific or general tone */}
           {step === 2 &&
             (() => {
-              const q = focusSpace
-                ? SPACE_QUESTIONS[focusSpace]
-                : GENERAL_QUESTION;
+              const q = focusSpace ? SPACE_QUESTIONS[focusSpace] : GENERAL_QUESTION;
               const accent = focusSpace ? SPACE_COLORS[focusSpace] : null;
               return (
                 <>
@@ -325,29 +302,18 @@ export function CheckInOverlay({
                     `}</style>
                     {q.options.map((opt) => (
                       <button
+                        type="button"
                         key={opt.label}
                         onClick={() => handleToneSelect(opt.tone)}
                         className="checkin-tone-btn min-h-[44px] rounded-xl border px-6 py-4 text-sm transition-all"
                         style={
                           {
-                            '--btn-border': accent
-                              ? `${accent}18`
-                              : 'rgba(255,255,255,0.1)',
-                            '--btn-border-hover': accent
-                              ? `${accent}30`
-                              : 'rgba(255,255,255,0.2)',
-                            '--btn-bg': accent
-                              ? `${accent}06`
-                              : 'rgba(255,255,255,0.03)',
-                            '--btn-bg-hover': accent
-                              ? `${accent}10`
-                              : 'rgba(255,255,255,0.06)',
-                            '--btn-color': accent
-                              ? `${accent}aa`
-                              : 'rgba(255,255,255,0.6)',
-                            '--btn-color-hover': accent
-                              ? `${accent}dd`
-                              : 'rgba(255,255,255,0.8)',
+                            '--btn-border': accent ? `${accent}18` : 'rgba(255,255,255,0.1)',
+                            '--btn-border-hover': accent ? `${accent}30` : 'rgba(255,255,255,0.2)',
+                            '--btn-bg': accent ? `${accent}06` : 'rgba(255,255,255,0.03)',
+                            '--btn-bg-hover': accent ? `${accent}10` : 'rgba(255,255,255,0.06)',
+                            '--btn-color': accent ? `${accent}aa` : 'rgba(255,255,255,0.6)',
+                            '--btn-color-hover': accent ? `${accent}dd` : 'rgba(255,255,255,0.8)',
                             borderColor: 'var(--btn-border)',
                             backgroundColor: 'var(--btn-bg)',
                             color: 'var(--btn-color)',
@@ -367,6 +333,7 @@ export function CheckInOverlay({
       {/* Skip link */}
       {phase === 'questions' && (
         <button
+          type="button"
           onClick={handleSkip}
           className="fixed bottom-8 left-1/2 z-10 min-h-[44px] -translate-x-1/2 text-sm text-white/20 transition-colors hover:text-white/40"
         >

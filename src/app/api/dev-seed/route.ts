@@ -1,5 +1,5 @@
-import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 const COOKIE_NAME = 'colourmap_anon_id';
 
@@ -12,10 +12,7 @@ export async function GET(request: Request) {
   const id = searchParams.get('id');
 
   if (!id) {
-    return NextResponse.json(
-      { error: 'Missing id parameter' },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: 'Missing id parameter' }, { status: 400 });
   }
 
   const cookieStore = await cookies();

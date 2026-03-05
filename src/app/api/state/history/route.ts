@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import type { SpaceKey } from '@/lib/domain/types';
-import { loadStateHistory } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../lib/logger';
+import { loadStateHistory } from '@/lib/db/queries';
+import type { SpaceKey } from '@/lib/domain/types';
+import { getTraceId, logger } from '../../../../lib/logger';
 
 const VALID_SPACES: SpaceKey[] = ['health', 'connection', 'purpose'];
 
@@ -15,10 +15,7 @@ export async function GET(request: Request) {
     const days = Number.isNaN(parsed) ? 14 : Math.min(Math.max(parsed, 1), 365);
 
     if (!space || !VALID_SPACES.includes(space)) {
-      return NextResponse.json(
-        { error: 'Invalid space parameter' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid space parameter' }, { status: 400 });
     }
 
     const ownerId = await getAnonymousId();
@@ -32,9 +29,6 @@ export async function GET(request: Request) {
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to load state history' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load state history' }, { status: 500 });
   }
 }

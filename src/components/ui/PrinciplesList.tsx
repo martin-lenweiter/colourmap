@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { PrincipleItem } from './PrincipleItem';
+import { useCallback, useEffect, useState } from 'react';
 import type { Principle, SpaceKey } from '@/lib/domain/types';
+import { PrincipleItem } from './PrincipleItem';
 
 interface PrinciplesListProps {
   spaceKey: SpaceKey;
@@ -36,9 +36,7 @@ export function PrinciplesList({ spaceKey, color }: PrinciplesListProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ confirmed: true }),
       });
-      setPrinciples((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, confirmed: true } : p))
-      );
+      setPrinciples((prev) => prev.map((p) => (p.id === id ? { ...p, confirmed: true } : p)));
     } catch {
       // Silently fail
     }
@@ -51,9 +49,7 @@ export function PrinciplesList({ spaceKey, color }: PrinciplesListProps) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       });
-      setPrinciples((prev) =>
-        prev.map((p) => (p.id === id ? { ...p, text } : p))
-      );
+      setPrinciples((prev) => prev.map((p) => (p.id === id ? { ...p, text } : p)));
     } catch {
       // Silently fail
     }
@@ -104,9 +100,7 @@ export function PrinciplesList({ spaceKey, color }: PrinciplesListProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-[11px] tracking-widest text-white/30 uppercase">
-        Principles
-      </span>
+      <span className="text-[11px] tracking-widest text-white/30 uppercase">Principles</span>
 
       {visible.map((p) => (
         <PrincipleItem
@@ -121,6 +115,7 @@ export function PrinciplesList({ spaceKey, color }: PrinciplesListProps) {
 
       {hiddenCount > 0 && (
         <button
+          type="button"
           onClick={() => setExpanded(!expanded)}
           className="py-1 text-[11px] text-white/25 transition-colors hover:text-white/40"
         >
@@ -140,6 +135,7 @@ export function PrinciplesList({ spaceKey, color }: PrinciplesListProps) {
         />
         {newText.trim() && (
           <button
+            type="button"
             onClick={handleAdd}
             disabled={adding}
             className="min-h-[44px] min-w-[44px] text-xs text-white/40 transition-colors hover:text-white/60"

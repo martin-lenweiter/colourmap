@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { exportUserData, deleteAllUserData } from '@/lib/db/queries';
-import { getAnonymousId, clearAnonymousId } from '@/lib/auth';
+import { clearAnonymousId, getAnonymousId } from '@/lib/auth';
+import { deleteAllUserData, exportUserData } from '@/lib/db/queries';
 import { logger } from '../../../lib/logger';
 
 /** GET: Export all user data (JSON) */
@@ -19,10 +19,7 @@ export async function GET() {
       status: 500,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to export data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to export data' }, { status: 500 });
   }
 }
 
@@ -39,9 +36,6 @@ export async function DELETE() {
       status: 500,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to delete data' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete data' }, { status: 500 });
   }
 }

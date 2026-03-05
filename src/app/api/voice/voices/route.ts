@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { logger, getTraceId } from '../../../../lib/logger';
-import { listVoices, isTtsConfigured } from '@/lib/services/voice';
+import { isTtsConfigured, listVoices } from '@/lib/services/voice';
+import { getTraceId, logger } from '../../../../lib/logger';
 
 /** GET: List available TTS voices */
 export async function GET(request: Request) {
@@ -14,7 +14,7 @@ export async function GET(request: Request) {
     if (!isTtsConfigured()) {
       return NextResponse.json(
         { error: 'Voice not configured (ELEVENLABS_API_KEY missing)' },
-        { status: 503 }
+        { status: 503 },
       );
     }
 
@@ -35,9 +35,6 @@ export async function GET(request: Request) {
       traceId,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to list voices' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to list voices' }, { status: 500 });
   }
 }

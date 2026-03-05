@@ -1,8 +1,7 @@
 'use client';
 
-import { useRef, useEffect, useCallback } from 'react';
-import type { UserState, SpaceKey } from '@/lib/domain/types';
-import type { DriftInfo } from '@/lib/domain/types';
+import { useCallback, useEffect, useRef } from 'react';
+import type { DriftInfo, SpaceKey, UserState } from '@/lib/domain/types';
 
 interface GenerativeCanvasProps {
   state: UserState;
@@ -37,11 +36,7 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
-export function GenerativeCanvas({
-  state,
-  drift,
-  onOrbClick,
-}: GenerativeCanvasProps) {
+export function GenerativeCanvas({ state, drift, onOrbClick }: GenerativeCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const orbsRef = useRef<Orb[]>([]);
   const animRef = useRef<number>(0);
@@ -110,7 +105,7 @@ export function GenerativeCanvas({
         }
       }
     },
-    [onOrbClick]
+    [onOrbClick],
   );
 
   const handleMouseMove = useCallback(
@@ -137,7 +132,7 @@ export function GenerativeCanvas({
       hoveredOrbRef.current = found;
       canvas.style.cursor = found ? 'pointer' : 'default';
     },
-    [onOrbClick]
+    [onOrbClick],
   );
 
   const handleMouseLeave = useCallback(() => {
@@ -286,18 +281,13 @@ export function GenerativeCanvas({
 
         const drift = 25;
         orb.x = lerp(orb.x, orb.targetX + Math.sin(orb.phase) * drift, 0.02);
-        orb.y = lerp(
-          orb.y,
-          orb.targetY + Math.cos(orb.phase * 0.7) * drift,
-          0.02
-        );
+        orb.y = lerp(orb.y, orb.targetY + Math.cos(orb.phase * 0.7) * drift, 0.02);
 
         orb.radius = lerp(orb.radius, orb.targetRadius, 0.04);
         orb.alpha = lerp(orb.alpha, orb.targetAlpha, 0.04);
 
         orb.pulseBoost = lerp(orb.pulseBoost, 0, 0.02);
-        const pulse =
-          1 + Math.sin(orb.phase * 2) * (0.12 + orb.pulseBoost * 0.15);
+        const pulse = 1 + Math.sin(orb.phase * 2) * (0.12 + orb.pulseBoost * 0.15);
         const r = orb.radius * pulse * orb.hoverScale;
 
         // Attention + alignment control color saturation (grey when neglected/misaligned)
@@ -315,8 +305,7 @@ export function GenerativeCanvas({
         const hoverBrightness = 1 + orb.hoverGlow * 0.4;
         for (let i = layers; i >= 0; i--) {
           const layerRadius = r * (1 + i * 0.3);
-          const layerAlpha =
-            Math.min(orb.alpha * hoverBrightness, 0.95) * (1 - i * 0.2);
+          const layerAlpha = Math.min(orb.alpha * hoverBrightness, 0.95) * (1 - i * 0.2);
 
           const gradient = ctx.createRadialGradient(
             orb.x + turbulence,
@@ -324,7 +313,7 @@ export function GenerativeCanvas({
             0,
             orb.x + turbulence,
             orb.y + turbulence * 0.7,
-            layerRadius
+            layerRadius,
           );
           const [cr, cg, cb] = orb.color;
           const grey = 140;
@@ -332,25 +321,13 @@ export function GenerativeCanvas({
           const sg = Math.round(grey + (cg - grey) * saturation);
           const sb = Math.round(grey + (cb - grey) * saturation);
           gradient.addColorStop(0, `rgba(${sr}, ${sg}, ${sb}, ${layerAlpha})`);
-          gradient.addColorStop(
-            0.5,
-            `rgba(${sr}, ${sg}, ${sb}, ${layerAlpha * 0.75})`
-          );
-          gradient.addColorStop(
-            0.8,
-            `rgba(${sr}, ${sg}, ${sb}, ${layerAlpha * 0.25})`
-          );
+          gradient.addColorStop(0.5, `rgba(${sr}, ${sg}, ${sb}, ${layerAlpha * 0.75})`);
+          gradient.addColorStop(0.8, `rgba(${sr}, ${sg}, ${sb}, ${layerAlpha * 0.25})`);
           gradient.addColorStop(1, `rgba(${sr}, ${sg}, ${sb}, 0)`);
 
           ctx.filter = `blur(${blurAmount + i * 2.5}px)`;
           ctx.beginPath();
-          ctx.arc(
-            orb.x + turbulence,
-            orb.y + turbulence * 0.7,
-            layerRadius,
-            0,
-            Math.PI * 2
-          );
+          ctx.arc(orb.x + turbulence, orb.y + turbulence * 0.7, layerRadius, 0, Math.PI * 2);
           ctx.fillStyle = gradient;
           ctx.fill();
         }
@@ -375,7 +352,7 @@ export function GenerativeCanvas({
       cancelAnimationFrame(animRef.current);
       window.removeEventListener('resize', resize);
     };
-  }, []);
+  }, [onOrbClick]);
 
   return (
     <canvas

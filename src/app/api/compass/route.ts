@@ -1,19 +1,12 @@
 import { NextResponse } from 'next/server';
-import { generateCompassReading } from '@/lib/services/coach';
-import {
-  loadLatestCompassReading,
-  saveCompassReading,
-  loadUserState,
-  listPrinciples,
-  listFocusItems,
-} from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
+import { loadLatestCompassReading } from '@/lib/db/queries';
+import { generateAndSaveCompassReading } from '@/lib/services/compass';
 import { logger } from '../../../lib/logger';
 
 export async function GET() {
   try {
     const ownerId = await getAnonymousId();
-
     const reading = await loadLatestCompassReading(ownerId);
 
     if (reading) {
@@ -31,47 +24,25 @@ export async function GET() {
       status: 500,
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to load compass reading' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to load compass reading' }, { status: 500 });
   }
 }
 
 export async function POST() {
   try {
     const ownerId = await getAnonymousId();
-
-    const [state, principles, focusItems] = await Promise.all([
-      loadUserState(ownerId),
-      listPrinciples(ownerId),
-      listFocusItems(ownerId),
-    ]);
-
-    if (!state) {
-      return NextResponse.json(
-        { error: 'No state found — complete onboarding first' },
-        { status: 400 }
-      );
-    }
-
-    const generated = await generateCompassReading(
-      state,
-      principles,
-      focusItems
-    );
-    const reading = await saveCompassReading(ownerId, generated);
-
+    const reading = await generateAndSaveCompassReading(ownerId);
     return NextResponse.json({ reading, fresh: true });
   } catch (err) {
+    const message = err instanceof Error ? err.message : 'Failed to generate compass reading';
+    if (message.includes('onboarding')) {
+      return NextResponse.json({ error: message }, { status: 400 });
+    }
     logger.error('Compass POST failed', {
       path: '/api/compass',
       status: 500,
-      err: err instanceof Error ? err.message : String(err),
+      err: message,
     });
-    return NextResponse.json(
-      { error: 'Failed to generate compass reading' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate compass reading' }, { status: 500 });
   }
 }

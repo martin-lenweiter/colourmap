@@ -1,12 +1,9 @@
 import { NextResponse } from 'next/server';
-import { updatePrinciple, deletePrinciple } from '@/lib/db/queries';
 import { getAnonymousId } from '@/lib/auth';
-import { logger, getTraceId } from '../../../../lib/logger';
+import { deletePrinciple, updatePrinciple } from '@/lib/db/queries';
+import { getTraceId, logger } from '../../../../lib/logger';
 
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function PATCH(request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
@@ -15,10 +12,7 @@ export async function PATCH(
     try {
       body = (await request.json()) as typeof body;
     } catch {
-      return NextResponse.json(
-        { error: 'Invalid JSON in request body' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 });
     }
 
     const updates: { text?: string; confirmed?: boolean } = {};
@@ -26,18 +20,12 @@ export async function PATCH(
     if (typeof body.confirmed === 'boolean') updates.confirmed = body.confirmed;
 
     if (Object.keys(updates).length === 0) {
-      return NextResponse.json(
-        { error: 'No valid updates provided' },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: 'No valid updates provided' }, { status: 400 });
     }
 
     const updated = await updatePrinciple(id, ownerId, updates);
     if (!updated) {
-      return NextResponse.json(
-        { error: 'Principle not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Principle not found' }, { status: 404 });
     }
 
     return NextResponse.json({ ok: true });
@@ -48,27 +36,18 @@ export async function PATCH(
       traceId: getTraceId(request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to update principle' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to update principle' }, { status: 500 });
   }
 }
 
-export async function DELETE(
-  _request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
+export async function DELETE(_request: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const ownerId = await getAnonymousId();
     const { id } = await params;
 
     const deleted = await deletePrinciple(id, ownerId);
     if (!deleted) {
-      return NextResponse.json(
-        { error: 'Principle not found' },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: 'Principle not found' }, { status: 404 });
     }
 
     return NextResponse.json({ ok: true });
@@ -79,9 +58,6 @@ export async function DELETE(
       traceId: getTraceId(_request),
       err: err instanceof Error ? err.message : String(err),
     });
-    return NextResponse.json(
-      { error: 'Failed to delete principle' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to delete principle' }, { status: 500 });
   }
 }

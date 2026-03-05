@@ -8,13 +8,7 @@ interface ChatMessageProps {
   onRetry?: () => void;
 }
 
-export function ChatMessage({
-  role,
-  content,
-  compact,
-  isError,
-  onRetry,
-}: ChatMessageProps) {
+export function ChatMessage({ role, content, compact, isError, onRetry }: ChatMessageProps) {
   const isUser = role === 'user';
 
   if (compact) {

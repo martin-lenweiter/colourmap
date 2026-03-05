@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { FocusCard } from './FocusCard';
+import { useCallback, useEffect, useState } from 'react';
 import type { FocusItem, SpaceKey } from '@/lib/domain/types';
+import { FocusCard } from './FocusCard';
 
 interface FocusListProps {
   spaceKey: SpaceKey;
@@ -28,10 +28,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
     fetchItems();
   }, [fetchItems]);
 
-  const handleUpdateStatus = async (
-    id: string,
-    status: FocusItem['status']
-  ) => {
+  const handleUpdateStatus = async (id: string, status: FocusItem['status']) => {
     try {
       await fetch(`/api/focus/${id}`, {
         method: 'PATCH',
@@ -41,7 +38,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
       setItems((prev) =>
         status === 'archived'
           ? prev.filter((f) => f.id !== id)
-          : prev.map((f) => (f.id === id ? { ...f, status } : f))
+          : prev.map((f) => (f.id === id ? { ...f, status } : f)),
       );
     } catch {
       // Silently fail
@@ -77,9 +74,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
     }
   };
 
-  const active = items.filter(
-    (f) => f.status === 'active' || f.status === 'proposed'
-  );
+  const active = items.filter((f) => f.status === 'active' || f.status === 'proposed');
   const completed = items.filter((f) => f.status === 'completed');
 
   const MAX_ACTIVE = 4;
@@ -89,9 +84,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
 
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-[11px] tracking-widest text-white/30 uppercase">
-        Focus Areas
-      </span>
+      <span className="text-[11px] tracking-widest text-white/30 uppercase">Focus Areas</span>
 
       {visibleActive.map((f) => (
         <FocusCard key={f.id} item={f} onUpdateStatus={handleUpdateStatus} />
@@ -99,6 +92,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
 
       {hiddenActiveCount > 0 && (
         <button
+          type="button"
           onClick={() => setExpandedActive(!expandedActive)}
           className="py-1 text-[11px] text-white/25 transition-colors hover:text-white/40"
         >
@@ -131,6 +125,7 @@ export function FocusList({ spaceKey }: FocusListProps) {
         />
         {newText.trim() && (
           <button
+            type="button"
             onClick={handleAdd}
             disabled={adding}
             className="min-h-[44px] min-w-[44px] text-xs text-white/40 transition-colors hover:text-white/60"

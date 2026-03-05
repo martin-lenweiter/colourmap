@@ -1,13 +1,4 @@
-import {
-  pgTable,
-  text,
-  real,
-  json,
-  boolean,
-  timestamp,
-  index,
-  unique,
-} from 'drizzle-orm/pg-core';
+import { boolean, index, json, pgTable, real, text, timestamp, unique } from 'drizzle-orm/pg-core';
 
 export const colourmapUserState = pgTable(
   'colourmap_user_state',
