@@ -1,0 +1,114 @@
+# ColourMap
+> AI-powered clarity coaching through a living visual canvas of life alignment
+
+## Purpose
+ColourMap helps users navigate life decisions through conversational AI coaching and a generative visual canvas. It maps three life spaces (health, connection, purpose) into an evolving visual representation, surfacing alignment patterns, tensions, and growth areas. Target users: individuals seeking clarity and self-awareness through reflective dialogue.
+
+## Architecture
+- **App**: Next.js 16 (App Router) at `packages/apps/web-colourmap-application/`
+- **Bundle**: `packages/bundles/colourmap-product/` (application/, domain/, infrastructure/, presentation/)
+- **Contracts**: `packages/libs/contracts-colourmap-product/` (13 commands, queries, events)
+- **Database**: `packages/libs/database-colourmap-product/` (Prisma + Supabase)
+- **Layer flow**: app -> bundle -> contracts/database (no reverse)
+
+## API Surface
+
+### REST Endpoints (base: `/api/`)
+- `POST /api/chat` - AI coaching interaction (Anthropic Claude)
+- `GET /api/state` - Full user state (space states, drift, principles, focus)
+- `PATCH /api/state` - Update state
+- `GET /api/state/history` - Time-series alignment per space
+- `GET /api/state/history/all` - All spaces history
+- `GET /api/sessions` - List coaching sessions
+- `GET /api/sessions/:id/messages` - Session messages
+- `POST /api/sessions/:id/summary` - Generate session summary (AI)
+- `PATCH /api/sessions/:id/summary` - Correct summary
+- `GET /api/principles` - List principles
+- `POST /api/principles` - Create principle
+- `PATCH /api/principles/:id` - Update principle
+- `DELETE /api/principles/:id` - Delete principle
+- `GET /api/practices` - List practices
+- `POST /api/practices` - Create practice
+- `PATCH /api/practices/:id` - Update practice status
+- `GET /api/focus` - List focus items
+- `POST /api/focus` - Create focus item
+- `PATCH /api/focus/:id` - Update focus item
+- `GET /api/compass` - Latest compass reading
+- `POST /api/compass` - Generate compass reading (AI)
+- `POST /api/journal` - Ingest journal entry (AI extraction)
+- `GET /api/patterns` - Cross-session patterns
+- `POST /api/voice/transcribe` - STT (Mistral Voxtral)
+- `POST /api/voice/synthesize` - TTS (ElevenLabs)
+- `GET /api/voice/voices` - Available TTS voices
+- `GET /api/data` - Export user data
+- `DELETE /api/data` - Delete user data
+
+### Auth
+- `POST /api/auth/*` - Better Auth (session-based)
+
+## MCP Tools (12 tools, 3 resources, 3 prompts)
+
+### Tools
+- `colourmap.mcp.state.get` - Full state with space states, drift, principles, focus
+- `colourmap.mcp.state.history` - Time-series alignment for a life space
+- `colourmap.mcp.sessions.list` - All coaching sessions
+- `colourmap.mcp.session.messages` - Messages for a session
+- `colourmap.mcp.principles.list` - Principles, optionally by space
+- `colourmap.mcp.principle.create` - Create principle in a life space
+- `colourmap.mcp.practices.list` - Practices, optionally by space
+- `colourmap.mcp.practice.create` - Create practice in a life space
+- `colourmap.mcp.focus.list` - Focus items, optionally by space
+- `colourmap.mcp.focus.create` - Create focus item in a life space
+- `colourmap.mcp.compass.get` - Latest compass reading with freshness
+- `colourmap.mcp.compass.generate` - Generate compass from current state
+
+### Resources
+- `colourmap://spaces` - Three life spaces: health, connection, purpose
+- `colourmap://coach/persona` - Coach: warm, direct, curious (Tara Brach-inspired)
+- `colourmap://api/routes` - All HTTP API endpoints
+
+### Prompts
+- `colourmap.coach.checkin` - Daily check-in across three life spaces
+- `colourmap.coach.explore` - Deep-dive space exploration
+- `colourmap.coach.compass` - Holistic compass reading synthesis
+
+### MCP Endpoints
+- `POST /api/mcp/colourmap/*` - Domain MCP (Streamable HTTP)
+- `POST /api/mcp/docs/*` - DocBlocks MCP
+
+## AI Integration
+- **Coach model**: Anthropic Claude (`claude-sonnet-4-6`)
+- **Coach persona**: Warm, direct, curious clarity coach. Kind, not nice. Never diagnoses.
+- **Safety**: Crisis escalation protocol, not-therapy boundaries
+- **Priority system**: acute > staleness > misalignment > pattern > broadening
+- **Voice**: Mistral Voxtral (STT), ElevenLabs (TTS)
+- **Output format**: JSON (response + stateDeltas + suggestedFocus + suggestedPrinciple)
+
+## Authentication
+- **Provider**: Better Auth + Supabase anonymous auth
+- **OAuth**: Google, Apple, Microsoft, LinkedIn
+
+## Data Model
+- **Three spaces**: health, connection, purpose
+- **State per space**: attention (0-100), alignment (0-100), tone, tensions[]
+- **Principles**: Confirmed values anchoring coaching (per space)
+- **Practices**: Actionable behaviors tied to principles
+- **Focus items**: Active growth areas (max 3 active)
+- **Sessions**: Coaching conversations with message history
+- **Compass**: Cross-space pattern synthesis (cached 24h)
+- **Contracts**: `@contractspec/lib.contracts-colourmap-product`
+
+## Feature Flags
+- Convention: UPPERCASE_WITH_UNDERSCORE (PostHog)
+
+## Environment
+- Dev: `localhost:3000`
+- Database: Supabase (PostgreSQL)
+- Analytics: PostHog EU (proxied via `/ingest/`)
+- Deploys: Vercel
+
+## Specs
+- Vision: `specs/04_PROJECT_C_COLOURMAP/00_VISION.md`
+- Coach persona: `specs/04_PROJECT_C_COLOURMAP/03_COACH_PERSONA.md`
+- State schema: `specs/04_PROJECT_C_COLOURMAP/19_STATE_SCHEMA_V0.md`
+- Canvas mapping: `specs/04_PROJECT_C_COLOURMAP/20_CANVAS_VISUAL_MAPPING.md`

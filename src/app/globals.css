@@ -1,0 +1,196 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+
+@source './**/*.{ts,tsx}';
+@source '../**/*.{ts,tsx}';
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  /* ContractSpec brand palette - dark mode first */
+  --ink: #0b0f19;
+  --slate: #0f172a;
+  --zinc: #a1a1aa;
+  --white: #ffffff;
+  --violet: #7c3aed;
+
+  --background: rgb(11, 15, 25); /* ink */
+  --foreground: rgb(255, 255, 255); /* white */
+  --card: rgb(15, 23, 42); /* slate */
+  --card-foreground: rgb(255, 255, 255);
+  --popover: rgb(15, 23, 42);
+  --popover-foreground: rgb(255, 255, 255);
+  --primary: rgb(124, 58, 237); /* violet */
+  --primary-foreground: rgb(255, 255, 255);
+  --secondary: rgb(161, 161, 170); /* zinc */
+  --secondary-foreground: rgb(11, 15, 25);
+  --muted: rgb(63, 63, 70); /* darker zinc */
+  --muted-foreground: rgb(161, 161, 170);
+  --accent: rgb(124, 58, 237); /* violet */
+  --accent-foreground: rgb(255, 255, 255);
+  --destructive: rgb(239, 68, 68);
+  --destructive-foreground: rgb(255, 255, 255);
+  --border: rgb(39, 39, 42);
+  --input: rgb(39, 39, 42);
+  --ring: rgb(124, 58, 237);
+  --chart-1: rgb(124, 58, 237);
+  --chart-2: rgb(59, 130, 246);
+  --chart-3: rgb(168, 85, 247);
+  --chart-4: rgb(236, 72, 153);
+  --chart-5: rgb(14, 165, 233);
+  --radius: 1rem;
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+
+.dark {
+  --background: rgb(11, 15, 25);
+  --foreground: rgb(255, 255, 255);
+  --card: rgb(15, 23, 42);
+  --card-foreground: rgb(255, 255, 255);
+  --popover: rgb(15, 23, 42);
+  --popover-foreground: rgb(255, 255, 255);
+  --primary: rgb(124, 58, 237);
+  --primary-foreground: rgb(255, 255, 255);
+  --secondary: rgb(161, 161, 170);
+  --secondary-foreground: rgb(11, 15, 25);
+  --muted: rgb(63, 63, 70);
+  --muted-foreground: rgb(161, 161, 170);
+  --accent: rgb(124, 58, 237);
+  --accent-foreground: rgb(255, 255, 255);
+  --destructive: rgb(220, 38, 38);
+  --destructive-foreground: rgb(255, 255, 255);
+  --border: rgb(39, 39, 42);
+  --input: rgb(39, 39, 42);
+  --ring: rgb(124, 58, 237);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    scrollbar-width: none;
+  }
+  *::-webkit-scrollbar {
+    display: none;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  html {
+    @apply scroll-smooth;
+  }
+}
+
+@layer components {
+  .section-padding {
+    @apply px-4 py-16 md:px-6 md:py-20 lg:px-8 lg:py-24;
+  }
+
+  .hero-gradient {
+    background: radial-gradient(
+      circle at 30% 20%,
+      rgba(124, 58, 237, 0.15) 0%,
+      rgba(124, 58, 237, 0) 50%
+    );
+  }
+
+  .card-subtle {
+    @apply bg-card/50 border-border rounded-2xl border backdrop-blur-sm;
+  }
+
+  .btn-primary {
+    @apply bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:ring-ring inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none;
+  }
+
+  .btn-ghost {
+    @apply border-border text-foreground hover:bg-card focus-visible:ring-ring inline-flex items-center justify-center rounded-full border px-6 py-3 text-sm font-medium transition-all duration-200 focus-visible:ring-2 focus-visible:outline-none;
+  }
+
+  .badge {
+    @apply text-muted-foreground border-border bg-card/50 inline-block rounded-full border px-3 py-1 text-xs font-medium;
+  }
+
+  .fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .slide-in {
+    animation: slideIn 0.5s ease-in-out;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}

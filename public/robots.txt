@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /llms.txt
+Allow: /llms
+Allow: /api/mcp/
+Disallow: /api/auth/
+Disallow: /api/chat
+Disallow: /api/state
+Disallow: /api/sessions
+Disallow: /_next/
