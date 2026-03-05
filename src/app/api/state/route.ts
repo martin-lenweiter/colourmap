@@ -64,12 +64,18 @@ export async function GET(request: Request) {
     });
     return NextResponse.json(result);
   } catch (err) {
+    const pgErr = err as Record<string, unknown>;
     logger.error('State GET failed', {
       path: '/api/state',
       durationMs: Date.now() - start,
       status: 500,
       traceId,
       err: err instanceof Error ? err.message : String(err),
+      pgCode: pgErr.code,
+      pgSeverity: pgErr.severity,
+      pgDetail: pgErr.detail,
+      pgHint: pgErr.hint,
+      cause: pgErr.cause ? String(pgErr.cause) : undefined,
     });
     return NextResponse.json({ error: 'Failed to load state' }, { status: 500 });
   }
