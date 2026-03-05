@@ -7,10 +7,7 @@ const EMAIL_RE = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
 function redactPii(value: unknown): unknown {
   if (value == null) return value;
   if (typeof value === 'string') {
-    return (
-      value.replace(EMAIL_RE, '[email]').slice(0, 32) +
-      (value.length > 32 ? '…' : '')
-    );
+    return value.replace(EMAIL_RE, '[email]').slice(0, 256) + (value.length > 256 ? '…' : '');
   }
   if (Array.isArray(value)) return value.map(redactPii);
   if (typeof value === 'object') {
@@ -38,12 +35,7 @@ export type LogLevel = 'info' | 'warn' | 'error';
 
 export type LogMeta = Record<string, unknown>;
 
-function write(
-  level: LogLevel,
-  message: string,
-  meta?: LogMeta,
-  traceId?: string
-) {
+function write(level: LogLevel, message: string, meta?: LogMeta, traceId?: string) {
   const entry = {
     level,
     message,
@@ -53,9 +45,9 @@ function write(
   };
   const line = JSON.stringify(entry);
   if (level === 'error') {
-    process.stderr.write(line + '\n');
+    process.stderr.write(`${line}\n`);
   } else {
-    process.stdout.write(line + '\n');
+    process.stdout.write(`${line}\n`);
   }
 }
 
